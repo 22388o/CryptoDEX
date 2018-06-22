@@ -2108,25 +2108,31 @@ int64_t GetBlockValue(int nHeight)
     int64_t nSubsidy = 0;
 
     if (nHeight == 0) {
-        nSubsidy = 17500000 * COIN;
-    } else if (nHeight > 0 && nHeight <= 200) {
-        nSubsidy = 2500 * COIN;
-    } else if (nHeight > 200 && nHeight <= 775600) {
-        nSubsidy = 7 * COIN;
-    } else if (nHeight > 775600 && nHeight <= 1043999) {
-        nSubsidy = 4.5 * COIN;
-    } else if (nHeight > 1043999 && nHeight <= 1562398) {
-        nSubsidy = 3.6 * COIN;
+        nSubsidy = 550000 * COIN;
+ } else if (nHeight <= Params().LAST_POW_BLOCK() && nHeight > 0) {
+        nSubsidy = 8 * COIN;
+    } else if (nHeight <= 10000 && nHeight > Params().LAST_POW_BLOCK()) {
+        nSubsidy = 20 * COIN;
+    } else if (nHeight <= 12000 && nHeight >= 10000) {
+        nSubsidy = 18 * COIN;
     } else {
-        nSubsidy = 2.7 * COIN;
+        nSubsidy = 12 * COIN;
     }
     return nSubsidy;
 }
 
 int64_t GetMasternodePayment(int nHeight, int64_t blockValue, int nMasternodeCount)
-{
-    int64_t ret = blockValue / 5 * 3;
-    return ret;
+{  
+    int64_t ret = 0;
+
+   	// 70% for Masternodes
+	if (nHeight == 0) {
+	      ret = blockValue  / 100 * 0;
+	} else if (nHeight > 55) {
+		  ret = blockValue  / 100 * 70;
+		
+	}
+        return ret;
 }
 
 bool IsInitialBlockDownload()
