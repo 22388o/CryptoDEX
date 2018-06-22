@@ -183,7 +183,7 @@ typedef CMutexLock<CCriticalSection> CCriticalBlock;
         LeaveCritical();           \
     }
 
-class CSemaphore
+class CSemacryptodex
 {
 private:
     boost::condition_variable condition;
@@ -191,7 +191,7 @@ private:
     int value;
 
 public:
-    CSemaphore(int init) : value(init) {}
+    CSemacryptodex(int init) : value(init) {}
 
     void wait()
     {
@@ -221,11 +221,11 @@ public:
     }
 };
 
-/** RAII-style semaphore lock */
-class CSemaphoreGrant
+/** RAII-style semacryptodex lock */
+class CSemacryptodexGrant
 {
 private:
-    CSemaphore* sem;
+    CSemacryptodex* sem;
     bool fHaveGrant;
 
 public:
@@ -252,7 +252,7 @@ public:
         return fHaveGrant;
     }
 
-    void MoveTo(CSemaphoreGrant& grant)
+    void MoveTo(CSemacryptodexGrant& grant)
     {
         grant.Release();
         grant.sem = sem;
@@ -261,9 +261,9 @@ public:
         fHaveGrant = false;
     }
 
-    CSemaphoreGrant() : sem(NULL), fHaveGrant(false) {}
+    CSemacryptodexGrant() : sem(NULL), fHaveGrant(false) {}
 
-    CSemaphoreGrant(CSemaphore& sema, bool fTry = false) : sem(&sema), fHaveGrant(false)
+    CSemacryptodexGrant(CSemacryptodex& sema, bool fTry = false) : sem(&sema), fHaveGrant(false)
     {
         if (fTry)
             TryAcquire();
@@ -271,7 +271,7 @@ public:
             Acquire();
     }
 
-    ~CSemaphoreGrant()
+    ~CSemacryptodexGrant()
     {
         Release();
     }

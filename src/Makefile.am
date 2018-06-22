@@ -80,15 +80,15 @@ noinst_PROGRAMS =
 TESTS =
 
 if BUILD_BITCOIND
-  bin_PROGRAMS += phored
+  bin_PROGRAMS += cryptodexd
 endif
 
 if BUILD_BITCOIN_UTILS
-  bin_PROGRAMS += phore-cli phore-tx
+  bin_PROGRAMS += cryptodex-cli cryptodex-tx
 endif
 
 .PHONY: FORCE
-# phore core #
+# cryptodex core #
 BITCOIN_CORE_H = \
   activemasternode.h \
   accumulators.h \
@@ -196,7 +196,7 @@ obj/build.h: FORCE
 	  "$(abs_top_srcdir)"
 libbitcoin_util_a-clientversion.$(OBJEXT): obj/build.h
 
-# server: shared between phored and phore-qt
+# server: shared between cryptodexd and cryptodex-qt
 libbitcoin_server_a_CPPFLAGS = $(AM_CPPFLAGS) $(BITCOIN_INCLUDES) $(MINIUPNPC_CPPFLAGS) $(EVENT_CFLAGS) $(EVENT_PTHREADS_CFLAGS)
 libbitcoin_server_a_CXXFLAGS = $(AM_CXXFLAGS) $(PIE_FLAGS)
 libbitcoin_server_a_SOURCES = \
@@ -242,7 +242,7 @@ libbitcoin_zmq_a_SOURCES = \
   zmq/zmqpublishnotifier.cpp
 endif
 
-# wallet: shared between phored and phore-qt, but only linked
+# wallet: shared between cryptodexd and cryptodex-qt, but only linked
 # when wallet enabled
 libbitcoin_wallet_a_CPPFLAGS = $(AM_CPPFLAGS) $(BITCOIN_INCLUDES)
 libbitcoin_wallet_a_CXXFLAGS = $(AM_CXXFLAGS) $(PIE_FLAGS)
@@ -331,7 +331,7 @@ libzerocoin_libbitcoin_zerocoin_a_SOURCES = \
   libzerocoin/Params.cpp \
   libzerocoin/SerialNumberSignatureOfKnowledge.cpp
 
-# common: shared between phored, and phore-qt and non-server tools
+# common: shared between cryptodexd, and cryptodex-qt and non-server tools
 libbitcoin_common_a_CPPFLAGS = $(AM_CPPFLAGS) $(BITCOIN_INCLUDES)
 libbitcoin_common_a_CXXFLAGS = $(AM_CXXFLAGS) $(PIE_FLAGS)
 libbitcoin_common_a_SOURCES = \
@@ -393,7 +393,7 @@ if GLIBC_BACK_COMPAT
 libbitcoin_util_a_SOURCES += compat/glibc_compat.cpp
 endif
 
-# cli: shared between phore-cli and phore-qt
+# cli: shared between cryptodex-cli and cryptodex-qt
 libbitcoin_cli_a_CPPFLAGS = $(AM_CPPFLAGS) $(BITCOIN_INCLUDES)
 libbitcoin_cli_a_CXXFLAGS = $(AM_CXXFLAGS) $(PIE_FLAGS)
 libbitcoin_cli_a_SOURCES = \
@@ -403,16 +403,16 @@ libbitcoin_cli_a_SOURCES = \
 nodist_libbitcoin_util_a_SOURCES = $(srcdir)/obj/build.h
 #
 
-# phored binary #
-phored_SOURCES = phored.cpp
-phored_CPPFLAGS = $(AM_CPPFLAGS) $(BITCOIN_INCLUDES)
-phored_CXXFLAGS = $(AM_CXXFLAGS) $(PIE_FLAGS)
-phored_LDFLAGS = $(RELDFLAGS) $(AM_LDFLAGS) $(LIBTOOL_APP_LDFLAGS)
+# cryptodexd binary #
+cryptodexd_SOURCES = cryptodexd.cpp
+cryptodexd_CPPFLAGS = $(AM_CPPFLAGS) $(BITCOIN_INCLUDES)
+cryptodexd_CXXFLAGS = $(AM_CXXFLAGS) $(PIE_FLAGS)
+cryptodexd_LDFLAGS = $(RELDFLAGS) $(AM_LDFLAGS) $(LIBTOOL_APP_LDFLAGS)
 
 if TARGET_WINDOWS
-phored_SOURCES += phored-res.rc
+cryptodexd_SOURCES += cryptodexd-res.rc
 endif
-phored_LDADD = \
+cryptodexd_LDADD = \
   $(LIBBITCOIN_SERVER) \
   $(LIBBITCOIN_COMMON) \
   $(LIBUNIVALUE) \
@@ -425,38 +425,38 @@ phored_LDADD = \
   $(LIBMEMENV) \
   $(LIBSECP256K1)
 
-phored_LDADD += $(BOOST_LIBS) $(BDB_LIBS) $(SSL_LIBS) $(CRYPTO_LIBS) $(MINIUPNPC_LIBS) $(EVENT_PTHREADS_LIBS) $(EVENT_LIBS) $(ZMQ_LIBS)
+cryptodexd_LDADD += $(BOOST_LIBS) $(BDB_LIBS) $(SSL_LIBS) $(CRYPTO_LIBS) $(MINIUPNPC_LIBS) $(EVENT_PTHREADS_LIBS) $(EVENT_LIBS) $(ZMQ_LIBS)
 
-# phore-cli binary #
-phore_cli_SOURCES = phore-cli.cpp
-phore_cli_CPPFLAGS = $(AM_CPPFLAGS) $(BITCOIN_INCLUDES) $(EVENT_CFLAGS)
-phore_cli_CXXFLAGS = $(AM_CXXFLAGS) $(PIE_FLAGS)
-phore_cli_LDFLAGS = $(RELDFLAGS) $(AM_LDFLAGS) $(LIBTOOL_APP_LDFLAGS)
+# cryptodex-cli binary #
+cryptodex_cli_SOURCES = cryptodex-cli.cpp
+cryptodex_cli_CPPFLAGS = $(AM_CPPFLAGS) $(BITCOIN_INCLUDES) $(EVENT_CFLAGS)
+cryptodex_cli_CXXFLAGS = $(AM_CXXFLAGS) $(PIE_FLAGS)
+cryptodex_cli_LDFLAGS = $(RELDFLAGS) $(AM_LDFLAGS) $(LIBTOOL_APP_LDFLAGS)
 
 if TARGET_WINDOWS
-phore_cli_SOURCES += phore-cli-res.rc
+cryptodex_cli_SOURCES += cryptodex-cli-res.rc
 endif
 
-phore_cli_LDADD = \
+cryptodex_cli_LDADD = \
   $(LIBBITCOIN_CLI) \
   $(LIBUNIVALUE) \
   $(LIBBITCOIN_UTIL) \
   $(LIBBITCOIN_CRYPTO)
 
-phore_cli_LDADD += $(BOOST_LIBS) $(SSL_LIBS) $(CRYPTO_LIBS) $(EVENT_LIBS)
+cryptodex_cli_LDADD += $(BOOST_LIBS) $(SSL_LIBS) $(CRYPTO_LIBS) $(EVENT_LIBS)
 #
 
-# phore-tx binary #
-phore_tx_SOURCES = phore-tx.cpp
-phore_tx_CPPFLAGS = $(AM_CPPFLAGS) $(BITCOIN_INCLUDES)
-phore_tx_CXXFLAGS = $(AM_CXXFLAGS) $(PIE_FLAGS)
-phore_tx_LDFLAGS = $(RELDFLAGS) $(AM_LDFLAGS) $(LIBTOOL_APP_LDFLAGS)
+# cryptodex-tx binary #
+cryptodex_tx_SOURCES = cryptodex-tx.cpp
+cryptodex_tx_CPPFLAGS = $(AM_CPPFLAGS) $(BITCOIN_INCLUDES)
+cryptodex_tx_CXXFLAGS = $(AM_CXXFLAGS) $(PIE_FLAGS)
+cryptodex_tx_LDFLAGS = $(RELDFLAGS) $(AM_LDFLAGS) $(LIBTOOL_APP_LDFLAGS)
 
 if TARGET_WINDOWS
-phore_tx_SOURCES += phore-tx-res.rc
+cryptodex_tx_SOURCES += cryptodex-tx-res.rc
 endif
 
-phore_tx_LDADD = \
+cryptodex_tx_LDADD = \
   $(LIBUNIVALUE) \
   $(LIBBITCOIN_COMMON) \
   $(LIBBITCOIN_ZEROCOIN) \
@@ -464,7 +464,7 @@ phore_tx_LDADD = \
   $(LIBBITCOIN_CRYPTO) \
   $(LIBSECP256K1)
 
-phore_tx_LDADD += $(BOOST_LIBS) $(CRYPTO_LIBS)
+cryptodex_tx_LDADD += $(BOOST_LIBS) $(CRYPTO_LIBS)
 #
 
 # bitcoinconsensus library #

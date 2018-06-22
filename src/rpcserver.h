@@ -126,7 +126,7 @@ public:
 };
 
 /**
- * Phore RPC command dispatcher.
+ * CryptoDEX RPC command dispatcher.
  */
 class CRPCTable
 {

@@ -2,7 +2,7 @@
 // Copyright (c) 2009-2014 The Bitcoin developers
 // Copyright (c) 2014-2015 The Dash developers
 // Copyright (c) 2015-2017 The PIVX developers
-// Copyright (c) 2017 The Phore developers
+// Copyright (c) 2017 The CryptoDEX developers
 // Distributed under the MIT software license, see the accompanying
 // file COPYING or http://www.opensource.org/licenses/mit-license.php.
 
@@ -264,10 +264,10 @@ UniValue stop(const UniValue& params, bool fHelp)
     if (fHelp || params.size() > 1)
         throw runtime_error(
             "stop\n"
-            "\nStop Phore server.");
+            "\nStop CryptoDEX server.");
     // Shutdown will take long enough that the response should get back
     StartShutdown();
-    return "Phore server stopping";
+    return "CryptoDEX server stopping";
 }
 
 
@@ -350,36 +350,36 @@ static const CRPCCommand vRPCCommands[] =
         {"hidden", "reconsiderblock", &reconsiderblock, true, true, false},
         {"hidden", "setmocktime", &setmocktime, true, false, false},
 
-        /* Phore features */
-        {"phore", "masternode", &masternode, true, true, false},
-        {"phore", "listmasternodes", &listmasternodes, true, true, false},
-        {"phore", "getmasternodecount", &getmasternodecount, true, true, false},
-        {"phore", "masternodeconnect", &masternodeconnect, true, true, false},
-        {"phore", "masternodecurrent", &masternodecurrent, true, true, false},
-        {"phore", "masternodedebug", &masternodedebug, true, true, false},
-        {"phore", "startmasternode", &startmasternode, true, true, false},
-        {"phore", "createmasternodekey", &createmasternodekey, true, true, false},
-        {"phore", "getmasternodeoutputs", &getmasternodeoutputs, true, true, false},
-        {"phore", "listmasternodeconf", &listmasternodeconf, true, true, false},
-        {"phore", "getmasternodestatus", &getmasternodestatus, true, true, false},
-        {"phore", "getmasternodewinners", &getmasternodewinners, true, true, false},
-        {"phore", "getmasternodescores", &getmasternodescores, true, true, false},
-        {"phore", "mnbudget", &mnbudget, true, true, false},
-        {"phore", "preparebudget", &preparebudget, true, true, false},
-        {"phore", "submitbudget", &submitbudget, true, true, false},
-        {"phore", "mnbudgetvote", &mnbudgetvote, true, true, false},
-        {"phore", "getbudgetvotes", &getbudgetvotes, true, true, false},
-        {"phore", "getnextsuperblock", &getnextsuperblock, true, true, false},
-        {"phore", "getbudgetprojection", &getbudgetprojection, true, true, false},
-        {"phore", "getbudgetinfo", &getbudgetinfo, true, true, false},
-        {"phore", "mnbudgetrawvote", &mnbudgetrawvote, true, true, false},
-        {"phore", "mnfinalbudget", &mnfinalbudget, true, true, false},
-        {"phore", "checkbudgets", &checkbudgets, true, true, false},
-        {"phore", "mnsync", &mnsync, true, true, false},
-        {"phore", "spork", &spork, true, true, false},
-        {"phore", "getpoolinfo", &getpoolinfo, true, true, false},
+        /* CryptoDEX features */
+        {"cryptodex", "masternode", &masternode, true, true, false},
+        {"cryptodex", "listmasternodes", &listmasternodes, true, true, false},
+        {"cryptodex", "getmasternodecount", &getmasternodecount, true, true, false},
+        {"cryptodex", "masternodeconnect", &masternodeconnect, true, true, false},
+        {"cryptodex", "masternodecurrent", &masternodecurrent, true, true, false},
+        {"cryptodex", "masternodedebug", &masternodedebug, true, true, false},
+        {"cryptodex", "startmasternode", &startmasternode, true, true, false},
+        {"cryptodex", "createmasternodekey", &createmasternodekey, true, true, false},
+        {"cryptodex", "getmasternodeoutputs", &getmasternodeoutputs, true, true, false},
+        {"cryptodex", "listmasternodeconf", &listmasternodeconf, true, true, false},
+        {"cryptodex", "getmasternodestatus", &getmasternodestatus, true, true, false},
+        {"cryptodex", "getmasternodewinners", &getmasternodewinners, true, true, false},
+        {"cryptodex", "getmasternodescores", &getmasternodescores, true, true, false},
+        {"cryptodex", "mnbudget", &mnbudget, true, true, false},
+        {"cryptodex", "preparebudget", &preparebudget, true, true, false},
+        {"cryptodex", "submitbudget", &submitbudget, true, true, false},
+        {"cryptodex", "mnbudgetvote", &mnbudgetvote, true, true, false},
+        {"cryptodex", "getbudgetvotes", &getbudgetvotes, true, true, false},
+        {"cryptodex", "getnextsuperblock", &getnextsuperblock, true, true, false},
+        {"cryptodex", "getbudgetprojection", &getbudgetprojection, true, true, false},
+        {"cryptodex", "getbudgetinfo", &getbudgetinfo, true, true, false},
+        {"cryptodex", "mnbudgetrawvote", &mnbudgetrawvote, true, true, false},
+        {"cryptodex", "mnfinalbudget", &mnfinalbudget, true, true, false},
+        {"cryptodex", "checkbudgets", &checkbudgets, true, true, false},
+        {"cryptodex", "mnsync", &mnsync, true, true, false},
+        {"cryptodex", "spork", &spork, true, true, false},
+        {"cryptodex", "getpoolinfo", &getpoolinfo, true, true, false},
 #ifdef ENABLE_WALLET
-        {"phore", "obfuscation", &obfuscation, false, false, true}, /* not threadSafe because of SendMoney */
+        {"cryptodex", "obfuscation", &obfuscation, false, false, true}, /* not threadSafe because of SendMoney */
 
         /* Wallet */
         {"wallet", "addmultisigaddress", &addmultisigaddress, true, false, true},
@@ -606,7 +606,7 @@ std::vector<std::string> CRPCTable::listCommands() const
 
 std::string HelpExampleCli(string methodname, string args)
 {
-    return "> phore-cli " + methodname + " " + args + "\n";
+    return "> cryptodex-cli " + methodname + " " + args + "\n";
 }
 
 std::string HelpExampleRpc(string methodname, string args)

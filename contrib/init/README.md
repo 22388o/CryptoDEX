@@ -1,10 +1,10 @@
 Sample configuration files for:
 
-SystemD: phored.service
-Upstart: phored.conf
-OpenRC:  phored.openrc
-         phored.openrcconf
-CentOS:  phored.init
+SystemD: cryptodexd.service
+Upstart: cryptodexd.conf
+OpenRC:  cryptodexd.openrc
+         cryptodexd.openrcconf
+CentOS:  cryptodexd.init
 
 have been made available to assist packagers in creating node packages here.
 
