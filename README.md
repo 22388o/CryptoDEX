@@ -7,10 +7,10 @@ CryptoDEX is a cutting edge cryptocurrency, with many features not available in 
 - Anonymized transactions using zerocoin technology
 - 100% Proof of Stake 3.0 Consensus protocol, allowing very low transaction fees and energy expenditure, and staking rewards to all participants in the network
 - Masternode technology used to secure the network and provide the above features, each Masternode is secured
-  with collateral of 10K CDX
+  with collateral of 10K CXD
 - Decentralized blockchain voting utilizing Masternode technology to form a DAO. The blockchain will distribute monthly treasury funds based on successful proposals submitted by the community and voted on by the DAO.
 
-17.6M cryptodex was produced for swapping. 500k were mined 1-200 blocks to bring that amount to 18.1M CDX, the amount needed for the swap.
+17.6M cryptodex was produced for swapping. 500k were mined 1-200 blocks to bring that amount to 18.1M CXD, the amount needed for the swap.
 
 Since then, the CryptoDEX repository has been rebaselined to show the fork relationship properly.
 
@@ -18,7 +18,7 @@ Since then, the CryptoDEX repository has been rebaselined to show the fork relat
 
 https://bitcointalk.org/index.php?topic=2307909.0
 
-Rebrand from KryptKoin [KTK] to CryptoDEX [CDX]
+Rebrand from KryptKoin [KTK] to CryptoDEX [CXD]
 
 ## Coin Specs ##
 <table>
@@ -32,10 +32,10 @@ Rebrand from KryptKoin [KTK] to CryptoDEX [CDX]
 
 <table>
 <th>Block Height</th><th>Reward</th><th>Masternodes</th><th>Stakers</th>
-<tr><td><= 755,600</td><td>7.7 CDX</td><td>4.2 CDX</td><td>2.8 CDX</td></tr>
-<tr><td>755,601-1,043,999</td><td>5 CDX</td><td>2.7 CDX</td><td>1.8 CDX</td></tr>
-<tr><td>1,044,000-1,562,398</td><td>4 CDX</td><td>2.16 CDX</td><td>1.44 CDX</td></tr>
-<tr><td>> 1,562,399</td><td>3 CDX</td><td>1.62 CDX</td><td>1.08 CDX</td></tr>
+<tr><td><= 755,600</td><td>7.7 CXD</td><td>4.2 CXD</td><td>2.8 CXD</td></tr>
+<tr><td>755,601-1,043,999</td><td>5 CXD</td><td>2.7 CXD</td><td>1.8 CXD</td></tr>
+<tr><td>1,044,000-1,562,398</td><td>4 CXD</td><td>2.16 CXD</td><td>1.44 CXD</td></tr>
+<tr><td>> 1,562,399</td><td>3 CXD</td><td>1.62 CXD</td><td>1.08 CXD</td></tr>
 </table>
 
-The CryptoDEX development budget is up to a maximum of 1 CDX per block, paid out based on approved proposals as voted on by the CryptoDEX masternode owners through the community governance process.
+The CryptoDEX development budget is up to a maximum of 1 CXD per block, paid out based on approved proposals as voted on by the CryptoDEX masternode owners through the community governance process.

@@ -38,7 +38,7 @@ class TxViewDelegate : public QAbstractItemDelegate
 {
     Q_OBJECT
 public:
-    TxViewDelegate() : QAbstractItemDelegate(), unit(BitcoinUnits::CDX)
+    TxViewDelegate() : QAbstractItemDelegate(), unit(BitcoinUnits::CXD)
     {
     }
 
@@ -167,7 +167,7 @@ OverviewPage::~OverviewPage()
     delete ui;
 }
 
-void OverviewPage::getPercentage(CAmount nUnlockedBalance, CAmount nZerocoinBalance, QString& sCDXPercentage, QString& szCDXPercentage)
+void OverviewPage::getPercentage(CAmount nUnlockedBalance, CAmount nZerocoinBalance, QString& sCXDPercentage, QString& szCXDPercentage)
 {
     int nPrecision = 2;
     double dzPercentage = 0.0;
@@ -186,8 +186,8 @@ void OverviewPage::getPercentage(CAmount nUnlockedBalance, CAmount nZerocoinBala
 
     double dPercentage = 100.0 - dzPercentage;
     
-    szCDXPercentage = "(" + QLocale(QLocale::system()).toString(dzPercentage, 'f', nPrecision) + " %)";
-    sCDXPercentage = "(" + QLocale(QLocale::system()).toString(dPercentage, 'f', nPrecision) + " %)";
+    szCXDPercentage = "(" + QLocale(QLocale::system()).toString(dzPercentage, 'f', nPrecision) + " %)";
+    sCXDPercentage = "(" + QLocale(QLocale::system()).toString(dPercentage, 'f', nPrecision) + " %)";
     
 }
 
@@ -211,12 +211,12 @@ void OverviewPage::setBalance(const CAmount& balance, const CAmount& unconfirmed
         nLockedBalance = pwalletMain->GetLockedCoins();
         nWatchOnlyLockedBalance = pwalletMain->GetLockedWatchOnlyBalance();
     }
-    // CDX Balance
+    // CXD Balance
     CAmount nTotalBalance = balance + unconfirmedBalance;
     CAmount phrAvailableBalance = balance - immatureBalance - nLockedBalance;
     CAmount nTotalWatchBalance = watchOnlyBalance + watchUnconfBalance + watchImmatureBalance;    
     CAmount nUnlockedBalance = nTotalBalance - nLockedBalance;
-    // zCDX Balance
+    // zCXD Balance
     CAmount matureZerocoinBalance = zerocoinBalance - immatureZerocoinBalance;
     // Percentages
     QString szPercentage = "";
@@ -226,7 +226,7 @@ void OverviewPage::setBalance(const CAmount& balance, const CAmount& unconfirmed
     CAmount availableTotalBalance = phrAvailableBalance + matureZerocoinBalance;
     CAmount sumTotalBalance = nTotalBalance + zerocoinBalance;
 
-    // CDX labels
+    // CXD labels
     ui->labelBalance->setText(BitcoinUnits::floorHtmlWithUnit(nDisplayUnit, phrAvailableBalance, false, BitcoinUnits::separatorAlways));
     ui->labelUnconfirmed->setText(BitcoinUnits::floorHtmlWithUnit(nDisplayUnit, unconfirmedBalance, false, BitcoinUnits::separatorAlways));
     ui->labelImmature->setText(BitcoinUnits::floorHtmlWithUnit(nDisplayUnit, immatureBalance, false, BitcoinUnits::separatorAlways));
@@ -240,7 +240,7 @@ void OverviewPage::setBalance(const CAmount& balance, const CAmount& unconfirmed
     ui->labelWatchLocked->setText(BitcoinUnits::floorHtmlWithUnit(nDisplayUnit, nWatchOnlyLockedBalance, false, BitcoinUnits::separatorAlways));
     ui->labelWatchTotal->setText(BitcoinUnits::floorHtmlWithUnit(nDisplayUnit, nTotalWatchBalance, false, BitcoinUnits::separatorAlways));
 
-    // zCDX labels
+    // zCXD labels
     ui->labelzBalance->setText(BitcoinUnits::floorHtmlWithUnit(nDisplayUnit, zerocoinBalance, false, BitcoinUnits::separatorAlways));
     ui->labelzBalanceUnconfirmed->setText(BitcoinUnits::floorHtmlWithUnit(nDisplayUnit, unconfirmedZerocoinBalance, false, BitcoinUnits::separatorAlways));
     ui->labelzBalanceMature->setText(BitcoinUnits::floorHtmlWithUnit(nDisplayUnit, matureZerocoinBalance, false, BitcoinUnits::separatorAlways));
@@ -251,11 +251,11 @@ void OverviewPage::setBalance(const CAmount& balance, const CAmount& unconfirmed
     ui->labelTotalz->setText(BitcoinUnits::floorHtmlWithUnit(nDisplayUnit, sumTotalBalance, false, BitcoinUnits::separatorAlways));
 
     // Percentage labels
-    ui->labelCDXPercent->setText(sPercentage);
-    ui->labelzCDXPercent->setText(szPercentage);
+    ui->labelCXDPercent->setText(sPercentage);
+    ui->labelzCXDPercent->setText(szPercentage);
 
     // Adjust bubble-help according to AutoMint settings
-    QString automintHelp = tr("Current percentage of zCDX.\nIf AutoMint is enabled this percentage will settle around the configured AutoMint percentage (default = 10%).\n");
+    QString automintHelp = tr("Current percentage of zCXD.\nIf AutoMint is enabled this percentage will settle around the configured AutoMint percentage (default = 10%).\n");
     bool fEnableZeromint = GetBoolArg("-enablezeromint", false);
     int nZeromintPercentage = GetArg("-zeromintpercentage", 10);
     if (fEnableZeromint) {
@@ -272,39 +272,39 @@ void OverviewPage::setBalance(const CAmount& balance, const CAmount& unconfirmed
     bool showSumAvailable = settingShowAllBalances || sumTotalBalance != availableTotalBalance;
     ui->labelBalanceTextz->setVisible(showSumAvailable);
     ui->labelBalancez->setVisible(showSumAvailable);
-    bool showCDXAvailable = settingShowAllBalances || phrAvailableBalance != nTotalBalance;
-    bool showWatchOnlyCDXAvailable = watchOnlyBalance != nTotalWatchBalance;
-    bool showCDXPending = settingShowAllBalances || unconfirmedBalance != 0;
-    bool showWatchOnlyCDXPending = watchUnconfBalance != 0;
-    bool showCDXLocked = settingShowAllBalances || nLockedBalance != 0;
-    bool showWatchOnlyCDXLocked = nWatchOnlyLockedBalance != 0;
+    bool showCXDAvailable = settingShowAllBalances || phrAvailableBalance != nTotalBalance;
+    bool showWatchOnlyCXDAvailable = watchOnlyBalance != nTotalWatchBalance;
+    bool showCXDPending = settingShowAllBalances || unconfirmedBalance != 0;
+    bool showWatchOnlyCXDPending = watchUnconfBalance != 0;
+    bool showCXDLocked = settingShowAllBalances || nLockedBalance != 0;
+    bool showWatchOnlyCXDLocked = nWatchOnlyLockedBalance != 0;
     bool showImmature = settingShowAllBalances || immatureBalance != 0;
     bool showWatchOnlyImmature = watchImmatureBalance != 0;
     bool showWatchOnly = nTotalWatchBalance != 0;
-    ui->labelBalance->setVisible(showCDXAvailable || showWatchOnlyCDXAvailable);
-    ui->labelBalanceText->setVisible(showCDXAvailable || showWatchOnlyCDXAvailable);
-    ui->labelWatchAvailable->setVisible(showCDXAvailable && showWatchOnly);
-    ui->labelUnconfirmed->setVisible(showCDXPending || showWatchOnlyCDXPending);
-    ui->labelPendingText->setVisible(showCDXPending || showWatchOnlyCDXPending);
-    ui->labelWatchPending->setVisible(showCDXPending && showWatchOnly);
-    ui->labelLockedBalance->setVisible(showCDXLocked || showWatchOnlyCDXLocked);
-    ui->labelLockedBalanceText->setVisible(showCDXLocked || showWatchOnlyCDXLocked);
-    ui->labelWatchLocked->setVisible(showCDXLocked && showWatchOnly);
+    ui->labelBalance->setVisible(showCXDAvailable || showWatchOnlyCXDAvailable);
+    ui->labelBalanceText->setVisible(showCXDAvailable || showWatchOnlyCXDAvailable);
+    ui->labelWatchAvailable->setVisible(showCXDAvailable && showWatchOnly);
+    ui->labelUnconfirmed->setVisible(showCXDPending || showWatchOnlyCXDPending);
+    ui->labelPendingText->setVisible(showCXDPending || showWatchOnlyCXDPending);
+    ui->labelWatchPending->setVisible(showCXDPending && showWatchOnly);
+    ui->labelLockedBalance->setVisible(showCXDLocked || showWatchOnlyCXDLocked);
+    ui->labelLockedBalanceText->setVisible(showCXDLocked || showWatchOnlyCXDLocked);
+    ui->labelWatchLocked->setVisible(showCXDLocked && showWatchOnly);
     ui->labelImmature->setVisible(showImmature || showWatchOnlyImmature); // for symmetry reasons also show immature label when the watch-only one is shown
     ui->labelImmatureText->setVisible(showImmature || showWatchOnlyImmature);
     ui->labelWatchImmature->setVisible(showImmature && showWatchOnly); // show watch-only immature balance
-    bool showzCDXAvailable = settingShowAllBalances || zerocoinBalance != matureZerocoinBalance;
-    bool showzCDXUnconfirmed = settingShowAllBalances || unconfirmedZerocoinBalance != 0;
-    bool showzCDXImmature = settingShowAllBalances || immatureZerocoinBalance != 0;
-    ui->labelzBalanceMature->setVisible(showzCDXAvailable);
-    ui->labelzBalanceMatureText->setVisible(showzCDXAvailable);
-    ui->labelzBalanceUnconfirmed->setVisible(showzCDXUnconfirmed);
-    ui->labelzBalanceUnconfirmedText->setVisible(showzCDXUnconfirmed);
-    ui->labelzBalanceImmature->setVisible(showzCDXImmature);
-    ui->labelzBalanceImmatureText->setVisible(showzCDXImmature);
+    bool showzCXDAvailable = settingShowAllBalances || zerocoinBalance != matureZerocoinBalance;
+    bool showzCXDUnconfirmed = settingShowAllBalances || unconfirmedZerocoinBalance != 0;
+    bool showzCXDImmature = settingShowAllBalances || immatureZerocoinBalance != 0;
+    ui->labelzBalanceMature->setVisible(showzCXDAvailable);
+    ui->labelzBalanceMatureText->setVisible(showzCXDAvailable);
+    ui->labelzBalanceUnconfirmed->setVisible(showzCXDUnconfirmed);
+    ui->labelzBalanceUnconfirmedText->setVisible(showzCXDUnconfirmed);
+    ui->labelzBalanceImmature->setVisible(showzCXDImmature);
+    ui->labelzBalanceImmatureText->setVisible(showzCXDImmature);
     bool showPercentages = ! (zerocoinBalance == 0 && nTotalBalance == 0);
-    ui->labelCDXPercent->setVisible(showPercentages);
-    ui->labelzCDXPercent->setVisible(showPercentages);
+    ui->labelCXDPercent->setVisible(showPercentages);
+    ui->labelzCXDPercent->setVisible(showPercentages);
 
     static int cachedTxLocks = 0;
 
@@ -375,7 +375,7 @@ void OverviewPage::setWalletModel(WalletModel* model)
         connect(model, SIGNAL(notifyWatchonlyChanged(bool)), this, SLOT(updateWatchOnlyLabels(bool)));
     }
 
-    // update the display unit, to not use the default ("CDX")
+    // update the display unit, to not use the default ("CXD")
     updateDisplayUnit();
 }
 

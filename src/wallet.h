@@ -80,29 +80,29 @@ enum AvailableCoinsType {
     ALL_COINS = 1,
     ONLY_DENOMINATED = 2,
     ONLY_NOT10000IFMN = 3,
-    ONLY_NONDENOMINATED_NOT10000IFMN = 4, // ONLY_NONDENOMINATED and not 10000 CDX at the same time
+    ONLY_NONDENOMINATED_NOT10000IFMN = 4, // ONLY_NONDENOMINATED and not 10000 CXD at the same time
     ONLY_10000 = 5,                        // find masternode outputs including locked ones (use with caution)
     STAKABLE_COINS = 6                          // UTXO's that are valid for staking
 };
 
-// Possible states for zCDX send
+// Possible states for zCXD send
 enum ZerocoinSpendStatus {
-    ZCDX_SPEND_OKAY = 0,                            // No error
-    ZCDX_SPEND_ERROR = 1,                           // Unspecified class of errors, more details are (hopefully) in the returning text
-    ZCDX_WALLET_LOCKED = 2,                         // Wallet was locked
-    ZCDX_COMMIT_FAILED = 3,                         // Commit failed, reset status
-    ZCDX_ERASE_SPENDS_FAILED = 4,                   // Erasing spends during reset failed
-    ZCDX_ERASE_NEW_MINTS_FAILED = 5,                // Erasing new mints during reset failed
-    ZCDX_TRX_FUNDS_PROBLEMS = 6,                    // Everything related to available funds
-    ZCDX_TRX_CREATE = 7,                            // Everything related to create the transaction
-    ZCDX_TRX_CHANGE = 8,                            // Everything related to transaction change
-    ZCDX_TXMINT_GENERAL = 9,                        // General errors in MintToTxIn
-    ZCDX_INVALID_COIN = 10,                         // Selected mint coin is not valid
-    ZCDX_FAILED_ACCUMULATOR_INITIALIZATION = 11,    // Failed to initialize witness
-    ZCDX_INVALID_WITNESS = 12,                      // Spend coin transaction did not verify
-    ZCDX_BAD_SERIALIZATION = 13,                    // Transaction verification failed
-    ZCDX_SPENT_USED_ZCDX = 14,                      // Coin has already been spend
-    ZCDX_TX_TOO_LARGE = 15                          // The transaction is larger than the max tx size
+    ZCXD_SPEND_OKAY = 0,                            // No error
+    ZCXD_SPEND_ERROR = 1,                           // Unspecified class of errors, more details are (hopefully) in the returning text
+    ZCXD_WALLET_LOCKED = 2,                         // Wallet was locked
+    ZCXD_COMMIT_FAILED = 3,                         // Commit failed, reset status
+    ZCXD_ERASE_SPENDS_FAILED = 4,                   // Erasing spends during reset failed
+    ZCXD_ERASE_NEW_MINTS_FAILED = 5,                // Erasing new mints during reset failed
+    ZCXD_TRX_FUNDS_PROBLEMS = 6,                    // Everything related to available funds
+    ZCXD_TRX_CREATE = 7,                            // Everything related to create the transaction
+    ZCXD_TRX_CHANGE = 8,                            // Everything related to transaction change
+    ZCXD_TXMINT_GENERAL = 9,                        // General errors in MintToTxIn
+    ZCXD_INVALID_COIN = 10,                         // Selected mint coin is not valid
+    ZCXD_FAILED_ACCUMULATOR_INITIALIZATION = 11,    // Failed to initialize witness
+    ZCXD_INVALID_WITNESS = 12,                      // Spend coin transaction did not verify
+    ZCXD_BAD_SERIALIZATION = 13,                    // Transaction verification failed
+    ZCXD_SPENT_USED_ZCXD = 14,                      // Coin has already been spend
+    ZCXD_TX_TOO_LARGE = 15                          // The transaction is larger than the max tx size
 };
 
 struct CompactTallyItem {

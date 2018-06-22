@@ -37,7 +37,7 @@ map<uint256, CObfuscationBroadcastTx> mapObfuscationBroadcastTxes;
 // Keep track of the active Masternode
 CActiveMasternode activeMasternode;
 
-/* *** BEGIN OBFUSCATION MAGIC - CDX **********
+/* *** BEGIN OBFUSCATION MAGIC - CXD **********
     Copyright (c) 2014-2015, Dash Developers
         eduffield - evan@dashpay.io
         udjinm6   - udjinm6@dashpay.io
@@ -779,7 +779,7 @@ void CObfuscationPool::ChargeRandomFees()
                 with using it to stop abuse. Otherwise it could serve as an attack vector and
                 allow endless transaction that would bloat CryptoDEX and make it unusable. To
                 stop these kinds of attacks 1 in 10 successful transactions are charged. This
-                adds up to a cost of 0.001 CDX per transaction on average.
+                adds up to a cost of 0.001 CXD per transaction on average.
             */
             if (r <= 10) {
                 LogPrintf("CObfuscationPool::ChargeRandomFees -- charging random fees. %u\n", i);
@@ -1917,10 +1917,10 @@ void CObfuscationPool::GetDenominationsToString(int nDenom, std::string& strDeno
 {
     // Function returns as follows:
     //
-    // bit 0 - 100CDX+1 ( bit on if present )
-    // bit 1 - 10CDX+1
-    // bit 2 - 1CDX+1
-    // bit 3 - .1CDX+1
+    // bit 0 - 100CXD+1 ( bit on if present )
+    // bit 1 - 10CXD+1
+    // bit 2 - 1CXD+1
+    // bit 3 - .1CXD+1
     // bit 3 - non-denom
 
 
@@ -1990,10 +1990,10 @@ int CObfuscationPool::GetDenominations(const std::vector<CTxOut>& vout, bool fSi
 
     // Function returns as follows:
     //
-    // bit 0 - 100CDX+1 ( bit on if present )
-    // bit 1 - 10CDX+1
-    // bit 2 - 1CDX+1
-    // bit 3 - .1CDX+1
+    // bit 0 - 100CXD+1 ( bit on if present )
+    // bit 1 - 10CXD+1
+    // bit 2 - 1CXD+1
+    // bit 3 - .1CXD+1
 
     return denom;
 }

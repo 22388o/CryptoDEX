@@ -181,7 +181,7 @@
       <string>Asks</string>
      </property>
     </widget>
-    <widget class="QLabel" name="CDXSupply">
+    <widget class="QLabel" name="CXDSupply">
      <property name="geometry">
       <rect>
        <x>540</x>
@@ -197,7 +197,7 @@
       <set>Qt::AlignRight|Qt::AlignTrailing|Qt::AlignVCenter</set>
      </property>
     </widget>
-    <widget class="QLabel" name="CDXDemand">
+    <widget class="QLabel" name="CXDDemand">
      <property name="geometry">
       <rect>
        <x>160</x>
@@ -432,7 +432,7 @@
     <attribute name="title">
      <string>Buy</string>
     </attribute>
-    <widget class="QPushButton" name="BuyCDX">
+    <widget class="QPushButton" name="BuyCXD">
      <property name="geometry">
       <rect>
        <x>30</x>
@@ -442,7 +442,7 @@
       </rect>
      </property>
      <property name="text">
-      <string>Buy CDX</string>
+      <string>Buy CXD</string>
      </property>
      <property name="icon">
       <iconset resource="../cryptodex.qrc">
@@ -512,7 +512,7 @@
       </rect>
      </property>
      <property name="text">
-      <string>CDX</string>
+      <string>CXD</string>
      </property>
     </widget>
     <widget class="QLabel" name="label_5">
@@ -1704,10 +1704,10 @@
       </rect>
      </property>
      <property name="text">
-      <string>CDX</string>
+      <string>CXD</string>
      </property>
     </widget>
-    <widget class="QLineEdit" name="UnitsInputCDX">
+    <widget class="QLineEdit" name="UnitsInputCXD">
      <property name="geometry">
       <rect>
        <x>310</x>
@@ -1741,7 +1741,7 @@
       </font>
      </property>
     </widget>
-    <widget class="QPushButton" name="SellCDXBTN">
+    <widget class="QPushButton" name="SellCXDBTN">
      <property name="geometry">
       <rect>
        <x>30</x>
@@ -1751,7 +1751,7 @@
       </rect>
      </property>
      <property name="text">
-      <string>Sell CDX</string>
+      <string>Sell CXD</string>
      </property>
      <property name="icon">
       <iconset resource="../cryptodex">
@@ -1777,12 +1777,12 @@
          </font>
         </property>
         <property name="text">
-         <string>CDX Available:</string>
+         <string>CXD Available:</string>
         </property>
        </widget>
       </item>
       <item>
-       <widget class="QLabel" name="CDXAvailableLabel">
+       <widget class="QLabel" name="CXDAvailableLabel">
         <property name="palette">
          <palette>
           <active>
@@ -2213,7 +2213,7 @@
        </widget>
       </item>
       <item>
-       <widget class="QLabel" name="labelCDX">
+       <widget class="QLabel" name="labelCXD">
         <property name="font">
          <font>
           <weight>75</weight>
@@ -2221,7 +2221,7 @@
          </font>
         </property>
         <property name="text">
-         <string>CDX</string>
+         <string>CXD</string>
         </property>
        </widget>
       </item>
@@ -2733,7 +2733,7 @@
       <string>TextLabel</string>
      </property>
     </widget>
-    <widget class="QLabel" name="CDXBalanceLabel">
+    <widget class="QLabel" name="CXDBalanceLabel">
      <property name="geometry">
       <rect>
        <x>150</x>
@@ -2762,7 +2762,7 @@
       </font>
      </property>
      <property name="text">
-      <string>CDX Balance:</string>
+      <string>CXD Balance:</string>
      </property>
     </widget>
     <widget class="QLabel" name="label_12">
@@ -2784,7 +2784,7 @@
       <string>BTC Balance:</string>
      </property>
     </widget>
-    <widget class="QLabel" name="CDXAvailableLabel_2">
+    <widget class="QLabel" name="CXDAvailableLabel_2">
      <property name="geometry">
       <rect>
        <x>150</x>
@@ -2813,7 +2813,7 @@
       </font>
      </property>
      <property name="text">
-      <string>CDX Available:</string>
+      <string>CXD Available:</string>
      </property>
     </widget>
     <widget class="QLabel" name="label_14">
@@ -2832,10 +2832,10 @@
       </font>
      </property>
      <property name="text">
-      <string>CDX Pending:</string>
+      <string>CXD Pending:</string>
      </property>
     </widget>
-    <widget class="QLabel" name="CDXPendingLabel">
+    <widget class="QLabel" name="CXDPendingLabel">
      <property name="geometry">
       <rect>
        <x>150</x>
@@ -2928,7 +2928,7 @@
       </font>
      </property>
      <property name="text">
-      <string>Bittrex CDX Deposit Address:</string>
+      <string>Bittrex CXD Deposit Address:</string>
      </property>
     </widget>
     <widget class="QPushButton" name="GenDepositBTN">

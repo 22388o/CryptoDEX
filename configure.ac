@@ -25,9 +25,9 @@ fi
 
 AC_CANONICAL_HOST
 
-AH_TOP([#ifndef CDX_CONFIG_H])
-AH_TOP([#define CDX_CONFIG_H])
-AH_BOTTOM([#endif //CDX_CONFIG_H])
+AH_TOP([#ifndef CXD_CONFIG_H])
+AH_TOP([#define CXD_CONFIG_H])
+AH_BOTTOM([#endif //CXD_CONFIG_H])
 
 dnl faketime breaks configure and is only needed for make. Disable it here.
 unset FAKETIME
