@@ -174,7 +174,7 @@ public:
         convertSeed6(vFixedSeeds, pnSeed6_main, ARRAYLEN(pnSeed6_main));
 
 //for premine TODO change this to true before release
-        fMiningRequiresPeers = false;
+        fMiningRequiresPeers = true;
 //only for premine true
         fAllowMinDifficultyBlocks = true;
         fDefaultConsistencyChecks = false;
