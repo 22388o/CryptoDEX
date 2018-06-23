@@ -75,7 +75,7 @@ public:
         consensus.nSubsidyHalvingInterval = 525600; // 1 year
         consensus.nMasternodePaymentsStartBlock = 1440; // 1 day
         consensus.nInstantSendKeepLock = 24;
-        consensus.nBudgetPaymentsStartBlock = 1000000000; // disable
+        consensus.nBudgetPaymentsStartBlock = 10000000000; // disable
         consensus.nBudgetPaymentsCycleBlocks = 43800; // 1 month
         consensus.nBudgetPaymentsWindowBlocks = 100;
         consensus.nBudgetProposalEstablishingTime = 60*60*24;
@@ -123,12 +123,12 @@ public:
          * The characters are rarely used upper ASCII, not valid as UTF-8, and produce
          * a large 32-bit integer with any alignment.
          */
-        pchMessageStart[0] = 0xb0;
-        pchMessageStart[1] = 0xd2;
-        pchMessageStart[2] = 0xca;
-        pchMessageStart[3] = 0xdc;
+        pchMessageStart[0] = 0xb1;
+        pchMessageStart[1] = 0xd3;
+        pchMessageStart[2] = 0xcd;
+        pchMessageStart[3] = 0xda;
         vAlertPubKey = ParseHex("049da9e573a09feca59113193b6e05c697c9518eee14d3acbcb9ea23ee4955da2238d0361225e365456bc114319dce2772cffaa8313095e6fb14f023dc6bb6bbbc");
-        nDefaultPort = 8989;
+        nDefaultPort = 7632;
         nMaxTipAge = 6 * 60 * 60;
         nDelayGetHeadersTime = 24 * 60 * 60;
         nPruneAfterHeight = 100000;
@@ -140,10 +140,10 @@ public:
         assert(genesis.hashMerkleRoot == uint256S("0x75a67463b386bb01fdea1160f4fad1c8cabd6cd86cdd76cd3a4c23af8cf71103"));
 
 
-        vSeeds.push_back(CDNSSeedData("cryptodexcash.com", "dnsseed.cryptodexcash.com"));
+       vSeeds.push_back(CDNSSeedData("seednode",  "45.63.89.104"));
 
-        // CryptoDex addresses start with 'A'
-        base58Prefixes[PUBKEY_ADDRESS] = std::vector<unsigned char>(1,23);
+        // CryptoDex addresses start with 'C'
+        base58Prefixes[PUBKEY_ADDRESS] = std::vector<unsigned char>(1,28);
         // CryptoDex script addresses start with '7'
         base58Prefixes[SCRIPT_ADDRESS] = std::vector<unsigned char>(1,16);
         // CryptoDex private keys start with '7' or 'A'
@@ -158,7 +158,7 @@ public:
 
         vFixedSeeds = std::vector<SeedSpec6>(pnSeed6_main, pnSeed6_main + ARRAYLEN(pnSeed6_main));
 
-        fMiningRequiresPeers = true;
+        fMiningRequiresPeers = false;
         fDefaultConsistencyChecks = false;
         fRequireStandard = true;
         fMineBlocksOnDemand = false;
@@ -238,7 +238,7 @@ public:
         pchMessageStart[2] = 0xbe;
         pchMessageStart[3] = 0xd6;
         vAlertPubKey = ParseHex("04e79673801e2d3ca929dac5d525c127d6380c779adad2429d79c9a5e53a8a0d26693ad73908d9ad0cd2374081c13a5eeebf8d777d0c61f3a125181216fe1a87d0");
-        nDefaultPort = 18989;
+        nDefaultPort = 12313;
         nMaxTipAge = 0x7fffffff; // allow mining on top of old blocks for testnet
         nDelayGetHeadersTime = 0x7fffffff;
         nPruneAfterHeight = 1000;
@@ -250,7 +250,7 @@ public:
 
         vFixedSeeds.clear();
         vSeeds.clear();
-        vSeeds.push_back(CDNSSeedData("cryptodexcash.com",  "testdnsseed.cryptodexcash.com"));
+       
 
         // Testnet CryptoDex addresses start with 'y'
         base58Prefixes[PUBKEY_ADDRESS] = std::vector<unsigned char>(1,140);

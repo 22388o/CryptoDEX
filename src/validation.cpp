@@ -1230,16 +1230,21 @@ NOTE:   unlike bitcoin we are using PREVIOUS block height here,
 */
 CAmount GetBlockSubsidy(int nPrevBits, int nPrevHeight, const Consensus::Params& consensusParams, bool fSuperblockPartOnly)
 {
-    CAmount nSubsidy = 100 * COIN;
+    CAmount nSubsidy = 12 * COIN;
 
-    if (nPrevHeight == 0)
-	      nSubsidy = 750000 * COIN;
-    else if (nPrevHeight < 512000)
-	      nSubsidy = static_cast<CAmount>(nSubsidy - (nSubsidy-1)*nPrevHeight/512000);
-    else
-        nSubsidy = 1 * COIN;
+       if (nPrevHeight == 0) {
+        nSubsidy = 526000 * COIN;
+    } else if (nPrevHeight <= 500 && nPrevHeight > 0) {
+        nSubsidy = 8 * COIN;
+    } else if (nPrevHeight <= 10000 && nPrevHeight > 500) {
+        nSubsidy = 20 * COIN;
+    } else if (nPrevHeight <= 12000 && nPrevHeight >= 10000) {
+        nSubsidy = 18 * COIN;
+    } else {
+        nSubsidy = 12 * COIN;
+    }
 
-    // yearly decline of production by 12.5% per year, projected ~30M coins by year 2050
+    // yearly decline of production by 12.5% per year, projected ~10M coins by year 2050
     for (int i = consensusParams.nSubsidyHalvingInterval; i <= nPrevHeight; i += consensusParams.nSubsidyHalvingInterval)
         nSubsidy -= nSubsidy/8;
 
@@ -1253,22 +1258,12 @@ CAmount GetMasternodePayment(int nHeight, CAmount blockValue)
 {
   CAmount ret = blockValue*40/100;
   int nRampPeriod = 64000;
-  if (nHeight < nRampPeriod)
-    ret = blockValue*40/100;
-  else if (nHeight < 2*nRampPeriod)
-    ret = blockValue*45/100;
-  else if (nHeight < 3*nRampPeriod)
-    ret = blockValue*50/100;
-  else if (nHeight < 4*nRampPeriod)
-    ret = blockValue*55/100;
-  else if (nHeight < 5*nRampPeriod)
-    ret = blockValue*60/100;
-  else if (nHeight < 6*nRampPeriod)
-    ret = blockValue*65/100;
-  else if (nHeight < 7*nRampPeriod)
-    ret = blockValue*70/100;
-  else // 512000+
-    ret = blockValue*75/100;
+if(nHeight > 60){
+    ret = 0.7 * blockValue;
+}
+else{
+    ret = 0 * blockValue;
+}
   return ret;
 }
 
