@@ -1,7 +1,7 @@
-TOR SUPPORT IN CryptoDEX
+TOR SUPPORT IN CXD CORE
 =======================
 
-It is possible to run CryptoDEX as a Tor hidden service, and connect to such services.
+It is possible to run CryptoDex Core as a Tor hidden service, and connect to such services.
 
 The following directions assume you have a Tor proxy running on port 9050. Many
 distributions default to having a SOCKS proxy listening on port 9050, but others
@@ -10,117 +10,124 @@ port. See [Tor Project FAQ:TBBSocksPort](https://www.torproject.org/docs/faq.htm
 for how to properly configure Tor.
 
 
-Run CryptoDEX behind a Tor proxy
+1. Run CryptoDex Core behind a Tor proxy
 ----------------------------------
 
-The first step is running CryptoDEX behind a Tor proxy. This will already make all
+The first step is running CryptoDex Core behind a Tor proxy. This will already make all
 outgoing connections be anonymized, but more is possible.
-```
--proxy=ip:port  Set the proxy server. If SOCKS5 is selected (default), this proxy
-                server will be used to try to reach .onion addresses as well.
 
--onion=ip:port  Set the proxy server to use for tor hidden services. You do not
-                need to set this if it's the same as -proxy. You can use -noonion
-                to explicitly disable access to hidden service.
+	-proxy=ip:port  Set the proxy server. If SOCKS5 is selected (default), this proxy
+	                server will be used to try to reach .onion addresses as well.
 
--listen         When using -proxy, listening is disabled by default. If you want
-                to run a hidden service (see next section), you'll need to enable
-                it explicitly.
+	-onion=ip:port  Set the proxy server to use for tor hidden services. You do not
+	                need to set this if it's the same as -proxy. You can use -noonion
+	                to explicitly disable access to hidden service.
 
--connect=X      When behind a Tor proxy, you can specify .onion addresses instead
--addnode=X      of IP addresses or hostnames in these parameters. It requires
--seednode=X     SOCKS5. In Tor mode, such addresses can also be exchanged with
-                other P2P nodes.
+	-listen         When using -proxy, listening is disabled by default. If you want
+	                to run a hidden service (see next section), you'll need to enable
+	                it explicitly.
 
--onlynet=tor    Only connect to .onion nodes and drop IPv4/6 connections.
-```
+	-connect=X      When behind a Tor proxy, you can specify .onion addresses instead
+	-addnode=X      of IP addresses or hostnames in these parameters. It requires
+	-seednode=X     SOCKS5. In Tor mode, such addresses can also be exchanged with
+	                other P2P nodes.
+
+	-onlynet=tor    Only connect to .onion nodes and drop IPv4/6 connections.
 
 An example how to start the client if the Tor proxy is running on local host on
 port 9050 and only allows .onion nodes to connect:
-```
-./cryptodexd -onion=127.0.0.1:9050 -onlynet=tor -listen=0 -addnode=dnetzj6l4cvo2fxy.onion:989
-```
+
+	./cryptodexd -onion=127.0.0.1:9050 -onlynet=tor -listen=0 -addnode=ssapp53tmftyjmjb.onion
 
 In a typical situation, this suffices to run behind a Tor proxy:
-```
-./cryptodexd -proxy=127.0.0.1:9050
-```
 
-Run a CryptoDEX hidden server
+	./cryptodexd -proxy=127.0.0.1:9050
+
+
+2. Run a CryptoDex Core hidden server
 -------------------------------
 
 If you configure your Tor system accordingly, it is possible to make your node also
 reachable from the Tor network. Add these lines to your /etc/tor/torrc (or equivalent
 config file):
-```
-ClientOnly 1
-SOCKSPort 9050
-SOCKSPolicy accept 127.0.0.1/8
-Log notice file /var/log/tor/notices.log
-ControlPort 9051
-HiddenServiceDir /var/lib/tor/dnet/
-HiddenServicePort 989 127.0.0.1:5647
-HiddenServiceStatistics 0
-ORPort 9001
-LongLivedPorts 989
-ExitPolicy reject *:*
-DisableDebuggerAttachment 0
-NumEntryGuards 8
-```
+
+	HiddenServiceDir /var/lib/tor/cryptodexcore-service/
+	HiddenServicePort 9999 127.0.0.1:9999
+	HiddenServicePort 19999 127.0.0.1:19999
 
 The directory can be different of course, but (both) port numbers should be equal to
-your cryptodexd's P2P listen port (5647 by default).
-```
--externalip=X   You can tell cryptodex about its publicly reachable address using
-                this option, and this can be a .onion address. Given the above
-                configuration, you can find your onion address in
-                /var/lib/tor/cryptodex-service/hostname. Onion addresses are given
-                preference for your node to advertize itself with, for connections
-                coming from unroutable addresses (such as 127.0.0.1, where the
-                Tor proxy typically runs).
+your cryptodexd's P2P listen port (9999 by default).
 
--listen         You'll need to enable listening for incoming connections, as this
-                is off by default behind a proxy.
+	-externalip=X   You can tell CryptoDex Core about its publicly reachable address using
+	                this option, and this can be a .onion address. Given the above
+	                configuration, you can find your onion address in
+	                /var/lib/tor/cryptodexcore-service/hostname. Onion addresses are given
+	                preference for your node to advertise itself with, for connections
+	                coming from unroutable addresses (such as 127.0.0.1, where the
+	                Tor proxy typically runs).
 
--discover       When -externalip is specified, no attempt is made to discover local
-                IPv4 or IPv6 addresses. If you want to run a dual stack, reachable
-                from both Tor and IPv4 (or IPv6), you'll need to either pass your
-                other addresses using -externalip, or explicitly enable -discover.
-                Note that both addresses of a dual-stack system may be easily
-                linkable using traffic analysis.
-```
+	-listen         You'll need to enable listening for incoming connections, as this
+	                is off by default behind a proxy.
+
+	-discover       When -externalip is specified, no attempt is made to discover local
+	                IPv4 or IPv6 addresses. If you want to run a dual stack, reachable
+	                from both Tor and IPv4 (or IPv6), you'll need to either pass your
+	                other addresses using -externalip, or explicitly enable -discover.
+	                Note that both addresses of a dual-stack system may be easily
+	                linkable using traffic analysis.
 
 In a typical situation, where you're only reachable via Tor, this should suffice:
-```
-./cryptodexd -proxy=127.0.0.1:9050 -externalip=dnetzj6l4cvo2fxy.onion:989 -listen
-```
 
-(obviously, replace the Onion address with your own). If you don't care too much
-about hiding your node, and want to be reachable on IPv4 as well, additionally
-specify:
-```
-./cryptodexd ... -discover
-```
+	./cryptodexd -proxy=127.0.0.1:9050 -externalip=ssapp53tmftyjmjb.onion -listen
 
-and open port 5647 on your firewall (or use -upnp).
+(obviously, replace the Onion address with your own). It should be noted that you still
+listen on all devices and another node could establish a clearnet connection, when knowing
+your address. To mitigate this, additionally bind the address of your Tor proxy:
+
+	./cryptodexd ... -bind=127.0.0.1
+
+If you don't care too much about hiding your node, and want to be reachable on IPv4
+as well, use `discover` instead:
+
+	./cryptodexd ... -discover
+
+and open port 9999 on your firewall (or use -upnp).
 
 If you only want to use Tor to reach onion addresses, but not use it as a proxy
 for normal IPv4/IPv6 communication, use:
-```
-./cryptodexd -onion=127.0.0.1:9050 -externalip=dnetzj6l4cvo2fxy.onion:989 -discover
-```
 
-List of known CryptoDEX Tor relays
+	./cryptodexd -onion=127.0.0.1:9050 -externalip=ssapp53tmftyjmjb.onion -discover
+
+
+3. List of known CryptoDex Core Tor relays
 ------------------------------------
-```
-y5kcscnhpygvvnjn.onion:989
-5bmhtjvn2jvwpiej.onion:989
-pyfdxkazur3iib7y.onion:989
-ok3ym5zy6m5klimk.onion:989
-i6vpvzk2jxuqqs5f.onion:989
-bgdhpb76fkbw5fmg.onion:989
-gtlqzb5zbws5di7g.onion:989
-f7j2m26rptm5f7af.onion:989
-dnetzj6l4cvo2fxy.onion:989
-s3v3n7xhqafg6sb7.onion:989
-```
+
+* [darkcoinie7ghp67.onion](http://darkcoinie7ghp67.onion/)
+* [drktalkwaybgxnoq.onion](http://drktalkwaybgxnoq.onion/)
+* [drkcoinooditvool.onion](http://drkcoinooditvool.onion/)
+* [darkcoxbtzggpmcc.onion](http://darkcoxbtzggpmcc.onion/)
+* [ssapp53tmftyjmjb.onion](http://ssapp53tmftyjmjb.onion/)
+* [j2dfl3cwxyxpbc7s.onion](http://j2dfl3cwxyxpbc7s.onion/)
+* [vf6d2mxpuhh2cbxt.onion](http://vf6d2mxpuhh2cbxt.onion/)
+* [rj24sicr6i4vsnkv.onion](http://rj24sicr6i4vsnkv.onion/)
+* [wrwx2dy7jyh32o53.onion](http://wrwx2dy7jyh32o53.onion/)
+* [f5ekot4ajkbe23gt.onion](http://f5ekot4ajkbe23gt.onion/)
+* [dshtord4mqvgzqev.onion](http://dshtord4mqvgzqev.onion/)
+
+
+4. Automatically listen on Tor
+--------------------------------
+
+Starting with Tor version 0.2.7.1 it is possible, through Tor's control socket
+API, to create and destroy 'ephemeral' hidden services programmatically.
+CryptoDex Core has been updated to make use of this.
+
+This means that if Tor is running (and proper authorization is available),
+CryptoDex Core automatically creates a hidden service to listen on, without
+manual configuration. This will positively affect the number of available
+.onion nodes.
+
+This new feature is enabled by default if CryptoDex Core is listening, and
+a connection to Tor can be made. It can be configured with the `-listenonion`,
+`-torcontrol` and `-torpassword` settings. To show verbose debugging
+information, pass `-debug=tor`.

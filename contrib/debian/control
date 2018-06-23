@@ -1,43 +1,42 @@
 Source: cryptodex
 Section: utils
 Priority: optional
-Maintainer: Julian Meyer <julian@cryptodex.io>
-Uploaders: Julian Meyer <julian@cryptodex.io>
+Maintainer: Holger Schinzel <holger@cryptodex.org>
+Uploaders: Holger Schinzel <holger@cryptodex.org>
 Build-Depends: debhelper,
  devscripts,
  automake,
  libtool,
  bash-completion,
- libboost-system-dev (>> 1.35) | libboost-system1.35-dev,
  libdb4.8++-dev,
  libssl-dev,
  pkg-config,
- libminiupnpc8-dev,
- libboost-filesystem-dev (>> 1.35) | libboost-filesystem1.35-dev,
- libboost-program-options-dev (>> 1.35) | libboost-program-options1.35-dev,
- libboost-thread-dev (>> 1.35) | libboost-thread1.35-dev,
- libboost-test-dev (>> 1.35) | libboost-test1.35-dev,
+ libevent-dev,
+ libboost-system1.48-dev | libboost-system-dev (>> 1.35),
+ libboost-filesystem1.48-dev | libboost-filesystem-dev (>> 1.35),
+ libboost-program-options1.48-dev | libboost-program-options-dev (>> 1.35),
+ libboost-thread1.48-dev | libboost-thread-dev (>> 1.35),
+ libboost-test1.48-dev | libboost-test-dev (>> 1.35),
+ libboost-chrono1.48-dev | libboost-chrono-dev (>> 1.35),
  qt4-qmake,
  libqt4-dev,
  libqrencode-dev,
- libprotobuf-dev, protobuf-compiler
+ libprotobuf-dev, protobuf-compiler,
+ python
 Standards-Version: 3.9.2
-Homepage: http://www.cryptodex.org
-Vcs-Git: git://github.com/cryptodexproject/CryptoDEX.git
-Vcs-Browser: http://github.com/cryptodexproject/CryptoDEX
+Homepage: https://www.cryptodex.org/
+Vcs-Git: git://github.com/cryptodexpay/cryptodex.git
+Vcs-Browser: https://github.com/cryptodexpay/cryptodex
 
 Package: cryptodexd
 Architecture: any
 Depends: ${shlibs:Depends}, ${misc:Depends}
 Description: peer-to-peer network based digital currency - daemon
- CryptoDEX is a free open source peer-to-peer electronic cash system that
- is completely decentralized, without the need for a central server or
- trusted parties.  Users hold the crypto keys to their own money and
- transact directly with each other, with the help of a P2P network to
- check for double-spending.
- .
- Full transaction history is stored locally at each client.  This
- requires 1+ GB of space, slowly growing.
+ CryptoDex is an experimental new digital currency that enables anonymous, instant
+ payments to anyone, anywhere in the world. CryptoDex uses peer-to-peer
+ technology to operate with no central authority: managing transactions
+ and issuing money are carried out collectively by the network. CryptoDex Core
+ is the name of the open source software which enables the use of this currency.
  .
  This package provides the daemon, cryptodexd, and the CLI tool
  cryptodex-cli to interact with the daemon.
@@ -46,13 +45,24 @@ Package: cryptodex-qt
 Architecture: any
 Depends: ${shlibs:Depends}, ${misc:Depends}
 Description: peer-to-peer network based digital currency - Qt GUI
- CryptoDEX is a free open source peer-to-peer electronic cash system that
- is completely decentralized, without the need for a central server or
- trusted parties.  Users hold the crypto keys to their own money and
- transact directly with each other, with the help of a P2P network to
- check for double-spending.
+ CryptoDex is an experimental new digital currency that enables anonymous, instant
+ payments to anyone, anywhere in the world. CryptoDex uses peer-to-peer
+ technology to operate with no central authority: managing transactions
+ and issuing money are carried out collectively by the network. CryptoDex Core
+ is the name of the open source software which enables the use of this currency.
  .
- Full transaction history is stored locally at each client.  This
- requires 1+ GB of space, slowly growing.
+ This package provides CryptoDex-Qt, a GUI for CryptoDex based on Qt.
+
+Package: cryptodex-tx
+Architecture: any
+Depends: ${shlibs:Depends}, ${misc:Depends}
+Description: peer-to-peer digital currency - standalone transaction tool
+ CryptoDex is an experimental new digital currency that enables anonymous, instant
+ payments to anyone, anywhere in the world. CryptoDex uses peer-to-peer
+ technology to operate with no central authority: managing transactions
+ and issuing money are carried out collectively by the network. CryptoDex Core
+ is the name of the open source software which enables the use of this currency.
  .
- This package provides CryptoDEX-Qt, a GUI for CryptoDEX based on Qt.
+ This package provides cryptodex-tx, a command-line transaction creation
+ tool which can be used without a cryptodex daemon.  Some means of
+ exchanging minimal transaction data with peers is still required.

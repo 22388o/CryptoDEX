@@ -16,8 +16,8 @@ BEGIN
     BEGIN
         BLOCK "040904E4" // U.S. English - multilingual (hex)
         BEGIN
-            VALUE "CompanyName",        "CryptoDEX"
-            VALUE "FileDescription",    "cryptodex-tx (CLI CryptoDEX transaction editor utility)"
+            VALUE "CompanyName",        "CryptoDex"
+            VALUE "FileDescription",    "cryptodex-tx (CLI CryptoDex transaction editor utility)"
             VALUE "FileVersion",        VER_FILEVERSION_STR
             VALUE "InternalName",       "cryptodex-tx"
             VALUE "LegalCopyright",     COPYRIGHT_STR

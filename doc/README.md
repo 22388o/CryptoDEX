@@ -1,63 +1,64 @@
-CryptoDEX Core
+CryptoDex Core 0.12.1
 =====================
 
-Setup
----------------------
-[CryptoDEX Core](http://cryptodex.org/wallet) is the original CryptoDEX client and it builds the backbone of the network. However, it downloads and stores the entire history of CryptoDEX transactions; depending on the speed of your computer and network connection, the synchronization process can take anywhere from a few hours to a day or more. Thankfully you only have to do this once.
+This is the official reference wallet for CryptoDex digital currency and comprises the backbone of the CryptoDex peer-to-peer network. You can [download CryptoDex Core](https://www.cryptodex.org/downloads/) or [build it yourself](#building) using the guides below.
 
 Running
 ---------------------
-The following are some helpful notes on how to run CryptoDEX on your native platform.
+The following are some helpful notes on how to run CryptoDex on your native platform.
 
 ### Unix
 
 Unpack the files into a directory and run:
 
-- bin/32/cryptodex-qt (GUI, 32-bit) or bin/32/cryptodexd (headless, 32-bit)
-- bin/64/cryptodex-qt (GUI, 64-bit) or bin/64/cryptodexd (headless, 64-bit)
+- `bin/cryptodex-qt` (GUI) or
+- `bin/cryptodexd` (headless)
 
 ### Windows
 
 Unpack the files into a directory, and then run cryptodex-qt.exe.
 
-### OSX
+### OS X
 
-Drag CryptoDEX-Qt to your applications folder, and then run CryptoDEX-Qt.
+Drag CryptoDex-Qt to your applications folder, and then run CryptoDex-Qt.
 
 ### Need Help?
 
-* See the documentation at the [CryptoDEX Wiki](https://en.bitcoin.it/wiki/Main_Page) ***TODO***
+* See the [CryptoDex documentation](https://cryptodexpay.atlassian.net/wiki/display/DOC)
 for help and more information.
-* Ask for help on [BitcoinTalk](https://bitcointalk.org/index.php?topic=1262920.0) or on the [CryptoDEX Forum](http://forum.cryptodex.org/).
-* Join one of our Slack groups [CryptoDEX Slack Groups](https://cryptodex.org/slack-logins/).
-* Join our Discord server [Discord Server](https://discord.gg/dTRhamf)
+* Ask for help on [#cryptodexpay](http://webchat.freenode.net?channels=cryptodexpay) on Freenode. If you don't have an IRC client use [webchat here](http://webchat.freenode.net?channels=cryptodexpay).
+* Ask for help on the [CryptoDexTalk](https://cryptodextalk.org/) forums.
 
 Building
 ---------------------
-The following are developer notes on how to build CryptoDEX on your native platform. They are not complete guides, but include notes on the necessary libraries, compile flags, etc.
+The following are developer notes on how to build CryptoDex Core on your native platform. They are not complete guides, but include notes on the necessary libraries, compile flags, etc.
 
-- [OSX Build Notes](build-osx.md)
+- [OS X Build Notes](build-osx.md)
 - [Unix Build Notes](build-unix.md)
+- [Windows Build Notes](build-windows.md)
+- [OpenBSD Build Notes](build-openbsd.md)
 - [Gitian Building Guide](gitian-building.md)
 
 Development
 ---------------------
-The CryptoDEX repo's [root README](https://github.com/cryptodexproject/CryptoDEX/blob/master/README.md) contains relevant information on the development process and automated testing.
+The CryptoDex Core repo's [root README](/README.md) contains relevant information on the development process and automated testing.
 
 - [Developer Notes](developer-notes.md)
 - [Multiwallet Qt Development](multiwallet-qt.md)
 - [Release Notes](release-notes.md)
 - [Release Process](release-process.md)
-- [Source Code Documentation (External Link)](https://dev.visucore.com/bitcoin/doxygen/) ***TODO***
+- Source Code Documentation ***TODO***
 - [Translation Process](translation_process.md)
+- [Translation Strings Policy](translation_strings_policy.md)
 - [Unit Tests](unit-tests.md)
 - [Unauthenticated REST Interface](REST-interface.md)
+- [Shared Libraries](shared-libraries.md)
+- [BIPS](bips.md)
 - [Dnsseed Policy](dnsseed-policy.md)
 
 ### Resources
-
-* Discuss on the [BitcoinTalk](https://bitcointalk.org/index.php?topic=1262920.0) or the [CryptoDEX](http://forum.cryptodex.org/) forum.
-* Join the [CryptoDEX-Dev](https://cryptodex-dev.slack.com/) Slack group ([Sign-Up](https://cryptodex-dev.herokuapp.com/)).
+* Discuss on the [CryptoDexTalk](https://cryptodextalk.org/) forums, in the Development & Technical Discussion board.
+* Discuss on [#cryptodexpay](http://webchat.freenode.net/?channels=cryptodexpay) on Freenode. If you don't have an IRC client use [webchat here](http://webchat.freenode.net/?channels=cryptodexpay).
 
 ### Miscellaneous
 - [Assets Attribution](assets-attribution.md)
@@ -67,6 +68,6 @@ The CryptoDEX repo's [root README](https://github.com/cryptodexproject/CryptoDEX
 
 License
 ---------------------
-Distributed under the [MIT/X11 software license](http://www.opensource.org/licenses/mit-license.php).
+Distributed under the [MIT software license](http://www.opensource.org/licenses/mit-license.php).
 This product includes software developed by the OpenSSL Project for use in the [OpenSSL Toolkit](https://www.openssl.org/). This product includes
 cryptographic software written by Eric Young ([eay@cryptsoft.com](mailto:eay@cryptsoft.com)), and UPnP software written by Thomas Bernard.

@@ -1,7 +1,5 @@
-// Copyright (c) 2009-2014 The Bitcoin developers
-// Copyright (c) 2014-2015 The Dash developers
-// Copyright (c) 2015-2017 The PIVX developers
-// Copyright (c) 2017 The CryptoDEX developers
+// Copyright (c) 2009-2015 The Bitcoin Core developers
+// Copyright (c) 2014-2017 The CryptoDex Core developers
 // Distributed under the MIT software license, see the accompanying
 // file COPYING or http://www.opensource.org/licenses/mit-license.php.
 
@@ -11,6 +9,8 @@
 
 #include "util.h"
 #include "uritests.h"
+#include "compattests.h"
+#include "trafficgraphdatatests.h"
 
 #ifdef ENABLE_WALLET
 #include "paymentservertests.h"
@@ -39,7 +39,7 @@ int main(int argc, char *argv[])
     // Don't remove this, it's needed to access
     // QCoreApplication:: in the tests
     QCoreApplication app(argc, argv);
-    app.setApplicationName("CryptoDEX-Qt-test");
+    app.setApplicationName("CryptoDex-Qt-test");
 
     SSL_library_init();
 
@@ -51,6 +51,13 @@ int main(int argc, char *argv[])
     if (QTest::qExec(&test2) != 0)
         fInvalid = true;
 #endif
+    CompatTests test4;
+    if (QTest::qExec(&test4) != 0)
+        fInvalid = true;
+
+    TrafficGraphDataTests test5;
+    if (QTest::qExec(&test5) != 0)
+        fInvalid = true;
 
     return fInvalid;
 }

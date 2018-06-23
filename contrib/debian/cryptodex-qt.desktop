@@ -1,9 +1,9 @@
 [Desktop Entry]
 Encoding=UTF-8
-Name=CryptoDEX
-Comment=CryptoDEX P2P Cryptocurrency
-Comment[fr]=CryptoDEX, monnaie virtuelle cryptographique pair à pair
-Comment[tr]=CryptoDEX, eşten eşe kriptografik sanal para birimi
+Name=CryptoDex
+Comment=CryptoDex P2P Cryptocurrency
+Comment[fr]=CryptoDex, monnaie virtuelle cryptographique pair à pair
+Comment[tr]=CryptoDex, eşten eşe kriptografik sanal para birimi
 Exec=cryptodex-qt %u
 Terminal=false
 Type=Application

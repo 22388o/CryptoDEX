@@ -5,7 +5,7 @@ connections, inter-process communication, and shared-memory,
 providing various message-oriented semantics such as publish/subscribe,
 request/reply, and push/pull.
 
-The CryptoDEX Core daemon can be configured to act as a trusted "border
+The CryptoDex Core daemon can be configured to act as a trusted "border
 router", implementing the cryptodex wire protocol and relay, making
 consensus decisions, maintaining the local blockchain database,
 broadcasting locally generated transactions into the network, and
@@ -33,7 +33,7 @@ buffering or reassembly.
 
 ## Prerequisites
 
-The ZeroMQ feature in CryptoDEX Core requires ZeroMQ API version 4.x or
+The ZeroMQ feature in CryptoDex Core requires ZeroMQ API version 4.x or
 newer. Typically, it is packaged by distributions as something like
 *libzmq3-dev*. The C++ wrapper for ZeroMQ is *not* needed.
 
@@ -45,7 +45,7 @@ operation.
 
 By default, the ZeroMQ feature is automatically compiled in if the
 necessary prerequisites are found.  To disable, use --disable-zmq
-during the *configure* step of building cryptodexd:
+during the *configure* step of building bitcoind:
 
     $ ./configure --disable-zmq (other options)
 
@@ -104,5 +104,5 @@ retrieve the chain from the last known block to the new tip.
 
 There are several possibilities that ZMQ notification can get lost
 during transmission depending on the communication type your are
-using. CryptoDEXd appends an up-counting sequence number to each
+using. CryptoDexd appends an up-counting sequence number to each
 notification which allows listeners to detect lost notifications.

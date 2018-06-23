@@ -8,7 +8,7 @@
 #include "compat.h"
 #include "util.h"
 #include "netbase.h"
-#include "rpcprotocol.h" // For HTTP status codes
+#include "rpc/protocol.h" // For HTTP status codes
 #include "sync.h"
 #include "ui_interface.h"
 
@@ -126,7 +126,7 @@ public:
     void Run()
     {
         ThreadCounter count(*this);
-        while (running) {
+        while (true) {
             WorkItem* i = 0;
             {
                 boost::unique_lock<boost::mutex> lock(cs);
@@ -152,8 +152,9 @@ public:
     void WaitExit()
     {
         boost::unique_lock<boost::mutex> lock(cs);
-        while (numThreads > 0)
+        while (numThreads > 0){
             cond.wait(lock);
+        }
     }
 
     /** Return current depth of queue */
@@ -188,6 +189,7 @@ static std::vector<CSubNet> rpc_allow_subnets;
 static WorkQueue<HTTPClosure>* workQueue = 0;
 //! Handlers for (sub)paths
 std::vector<HTTPPathHandler> pathHandlers;
+//! Bound listening sockets
 std::vector<evhttp_bound_socket *> boundSockets;
 
 /** Check if a network address is allowed to access the HTTP server */
@@ -205,12 +207,17 @@ static bool ClientAllowed(const CNetAddr& netaddr)
 static bool InitHTTPAllowList()
 {
     rpc_allow_subnets.clear();
-    rpc_allow_subnets.push_back(CSubNet("127.0.0.0/8")); // always allow IPv4 local subnet
-    rpc_allow_subnets.push_back(CSubNet("::1"));         // always allow IPv6 localhost
+    CNetAddr localv4;
+    CNetAddr localv6;
+    LookupHost("127.0.0.1", localv4, false);
+    LookupHost("::1", localv6, false);
+    rpc_allow_subnets.push_back(CSubNet(localv4, 8));      // always allow IPv4 local subnet
+    rpc_allow_subnets.push_back(CSubNet(localv6));         // always allow IPv6 localhost
     if (mapMultiArgs.count("-rpcallowip")) {
         const std::vector<std::string>& vAllow = mapMultiArgs["-rpcallowip"];
         BOOST_FOREACH (std::string strAllow, vAllow) {
-            CSubNet subnet(strAllow);
+            CSubNet subnet;
+            LookupSubNet(strAllow.c_str(), subnet);
             if (!subnet.IsValid()) {
                 uiInterface.ThreadSafeMessageBox(
                     strprintf("Invalid -rpcallowip subnet specification: %s. Valid are a single IP (e.g. 1.2.3.4), a network/netmask (e.g. 1.2.3.4/255.255.255.0) or a network/CIDR (e.g. 1.2.3.4/24).", strAllow),
@@ -304,10 +311,11 @@ static void http_reject_request_cb(struct evhttp_request* req, void*)
     LogPrint("http", "Rejecting request while shutting down\n");
     evhttp_send_error(req, HTTP_SERVUNAVAIL, NULL);
 }
+
 /** Event dispatcher thread */
 static void ThreadHTTP(struct event_base* base, struct evhttp* http)
 {
-    RenameThread("bitcoin-http");
+    RenameThread("cryptodex-http");
     LogPrint("http", "Entering http event loop\n");
     event_base_dispatch(base);
     // Event loop will be interrupted by InterruptHTTPServer()
@@ -356,7 +364,7 @@ static bool HTTPBindAddresses(struct evhttp* http)
 /** Simple wrapper to set thread name and run work queue */
 static void HTTPWorkQueueRun(WorkQueue<HTTPClosure>* queue)
 {
-    RenameThread("bitcoin-httpworker");
+    RenameThread("cryptodex-httpworker");
     queue->Run();
 }
 
@@ -458,9 +466,11 @@ void InterruptHTTPServer()
 {
     LogPrint("http", "Interrupting HTTP server\n");
     if (eventHTTP) {
+        // Unlisten sockets
         BOOST_FOREACH (evhttp_bound_socket *socket, boundSockets) {
             evhttp_del_accept_socket(eventHTTP, socket);
         }
+        // Reject requests on current connections
         evhttp_set_gencb(eventHTTP, http_reject_request_cb, NULL);
     }
     if (workQueue)
@@ -472,10 +482,14 @@ void StopHTTPServer()
     LogPrint("http", "Stopping HTTP server\n");
     if (workQueue) {
         LogPrint("http", "Waiting for HTTP worker threads to exit\n");
+#ifndef WIN32
+        // ToDo: Disabling WaitExit() for Windows platforms is an ugly workaround for the wallet not
+        // closing during a repair-restart. It doesn't hurt, though, because threadHTTP.timed_join
+        // below takes care of this and sends a loopbreak.
         workQueue->WaitExit();
+#endif        
         delete workQueue;
     }
-    MilliSleep(500); // Avoid race condition while the last HTTP-thread is exiting
     if (eventBase) {
         LogPrint("http", "Waiting for HTTP event thread to exit\n");
         // Give event loop a few seconds to exit (to send back last RPC responses), then break it
@@ -489,6 +503,7 @@ void StopHTTPServer()
 #else
         if (!threadHTTP.timed_join(boost::posix_time::milliseconds(2000))) {
 #endif
+
             LogPrintf("HTTP event loop did not exit within allotted time, sending loopbreak\n");
             event_base_loopbreak(eventBase);
             threadHTTP.join();
@@ -616,7 +631,7 @@ CService HTTPRequest::GetPeer()
         const char* address = "";
         uint16_t port = 0;
         evhttp_connection_get_peer(con, (char**)&address, &port);
-        peer = CService(address, port);
+        peer = LookupNumeric(address, port);
     }
     return peer;
 }
@@ -666,3 +681,4 @@ void UnregisterHTTPHandler(const std::string &prefix, bool exactMatch)
         pathHandlers.erase(i);
     }
 }
+

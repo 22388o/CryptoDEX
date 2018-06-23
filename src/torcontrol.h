@@ -8,16 +8,12 @@
 #ifndef BITCOIN_TORCONTROL_H
 #define BITCOIN_TORCONTROL_H
 
-#include <string>
-
-#include <boost/function.hpp>
-#include <boost/chrono/chrono.hpp>
-#include <boost/thread.hpp>
+#include "scheduler.h"
 
 extern const std::string DEFAULT_TOR_CONTROL;
 static const bool DEFAULT_LISTEN_ONION = true;
 
-void StartTorControl(boost::thread_group& threadGroup);
+void StartTorControl(boost::thread_group& threadGroup, CScheduler& scheduler);
 void InterruptTorControl();
 void StopTorControl();
 

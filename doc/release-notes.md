@@ -1,120 +1,145 @@
-CryptoDEX Core version 3.0.4 is now available from:
+CryptoDex Core version 0.12.2.3
+==========================
 
-  <https://github.com/cryptodexproject/cryptodex/releases>
+Release is now available from:
 
-This is a new minor-revision version release, including various bug fixes and
-performance improvements, as well as updated translations.
+  <https://www.cryptodex.org/downloads/#wallets>
+
+This is a new minor version release, bringing various bugfixes and other
+improvements.
 
 Please report bugs using the issue tracker at github:
 
-  <https://github.com/cryptodexproject/cryptodex/issues>
+  <https://github.com/cryptodexpay/cryptodex/issues>
 
 
-Mandatory Update
-==============
-
-CryptoDEX Core v3.0.4 is a mandatory update for all users. This release contains various updates/fixes pertaining to the zCXD protocol, supply tracking, block transmission and relaying, as well as usability and quality-of-life updates to the GUI.
-
-Users will have a grace period to update their clients before versions prior to this release are no longer allowed to connect to this (and future) version(s).
-
+Upgrading and downgrading
+=========================
 
 How to Upgrade
-==============
+--------------
 
-If you are running an older version, shut it down. Wait until it has completely shut down (which might take a few minutes for older versions), then run the installer (on Windows) or just copy over /Applications/CryptoDEX-Qt (on Mac) or cryptodexd/cryptodex-qt (on Linux).
+If you are running an older version, shut it down. Wait until it has completely
+shut down (which might take a few minutes for older versions), then run the
+installer (on Windows) or just copy over /Applications/CryptoDex-Qt (on Mac) or
+cryptodexd/cryptodex-qt (on Linux).
 
+Downgrade warning
+-----------------
 
-Compatibility
-==============
+### Downgrade to a version < 0.12.2.2
 
-CryptoDEX Core is extensively tested on multiple operating systems using
-the Linux kernel, macOS 10.8+, and Windows Vista and later.
+Because release 0.12.2.2 included the [per-UTXO fix](release-notes/cryptodex/release-notes-0.12.2.2.md#per-utxo-fix)
+which changed the structure of the internal database, you will have to reindex
+the database if you decide to use any pre-0.12.2.2 version.
 
-Microsoft ended support for Windows XP on [April 8th, 2014](https://www.microsoft.com/en-us/WindowsForBusiness/end-of-xp-support),
-No attempt is made to prevent installing or running the software on Windows XP, you
-can still do so at your own risk but be aware that there are known instabilities and issues.
-Please do not report issues about Windows XP to the issue tracker.
+Wallet forward or backward compatibility was not affected.
 
-CryptoDEX Core should also work on most other Unix-like systems but is not
-frequently tested on them.
+### Downgrade to 0.12.2.2
 
-### :exclamation::exclamation::exclamation: MacOS 10.13 High Sierra :exclamation::exclamation::exclamation:
+Downgrading to 0.12.2.2 does not require any additional actions, should be
+fully compatible.
 
-**Currently there are issues with the 3.0.x gitian releases on MacOS version 10.13 (High Sierra), no reports of issues on older versions of MacOS.**
-
-
-Notable Changes
+Notable changes
 ===============
 
-Refactoring of zPhr Spend Validation Code
----------------------
-zPhr spend validation was too rigid and did not give enough slack for reorganizations. Many staking wallets were unable to reorganize back to the correct blockchain when they had an orphan stake which contained a zPhr spend. zPhr double spending validation has been refactored to properly account for reorganization.
+InstantSend fixes
+-----------------
 
-Money Supply Calculation Fix
----------------------
-Coin supply incorrectly was counting spent zPhr as newly minted coins that are added to the coin supply, thus resulting in innacurate coin supply data.
+Coin selection could work slightly incorrect in some edge cases which could
+lead to a creation of an InstantSend transaction which only the local wallet
+would consider to be a good candidate for a lock. Such txes was not locked by
+the network but they were creating a confusion on the user side giving an
+impression of a slightly higher InstantSend failure rate.
 
-The coin supply is now correctly calculated and if a new wallet client is synced from scratch or if `-reindex=1` is used then the correct money supply will be calculated. If neither of these two options are used, the wallet client will automatically reindex the money supply calculations upon the first time opening the software after updating to v3.0.4. The reindex takes approximately 10-60 minutes depending on the hardware used. If the reindex is exited mid-process, it will continue where it left off upon restart.
+Another issue fixed in this release is that masternodes could vote for a tx
+that is not going to be accepted to the mempool sometimes. This could lead to
+a situation when user funds would be locked even though InstantSend transaction
+would not show up on the receiving side.
 
-Better Filtering of Transactions in Stake Miner
----------------------
-The stake miner code now filters out zPhr double spends that were rarely being slipped into blocks (and being rejected by peers when sent broadcast).
+Fix -liquidityprovider option
+-----------------------------
 
-More Responsive Shutdown Requests
----------------------
-When computationally expensive accumulator calculations are being performed and the user requests to close the application, the wallet will exit much sooner than before.
+Turned out that liquidityprovider mixing mode practically stopped working after
+recent improvements in the PrivateSend mixing algorithm due to a suboptimal
+looping which occurs only in this mode (due to a huge number of rounds). To fix
+the issue a small part of the mixing algorithm was reverted to a pre-0.12.2 one
+for this mode only. Regular users were not affected by the issue in any way and
+will continue to use the improved one just like before.
+
+Other improvements and bug fixes
+--------------------------------
+
+This release also fixes a few crashes and compatibility issues.
 
 
-3.0.4 Change log
-=================
+0.12.2.3 Change log
+===================
 
-Detailed release notes follow. This overview includes changes that affect
-behavior, not code moves, refactors and string updates. For convenience in locating
-the code changes and accompanying discussion, both the pull request and
-git merge commit are mentioned.
+See detailed [change log](https://github.com/cryptodexpay/cryptodex/compare/v0.12.2.2...cryptodexpay:v0.12.2.3) below.
 
-### P2P Protocol and Network Code
-- #294 `27c0943` Add additional checks for txid for zphr spend. (presstab)
-- #301 `b8392cd` Refactor zPhr tx counting code. Add a final check in ConnectBlock() (presstab)
-- #306 `77dd55c` [Core] Don't send not-validated blocks (Mrs-X)
-- #312 `5d79bea` [Main] Update last checkpoint data (Fuzzbawls)
-- #325 `7d98ebe` Reindex zPhr blocks and correct stats. (presstab)
-- #327 `aa1235a` [Main] Don't limit zCXD spends from getting into the mempool (Fuzzbawls)
-- #329 `19b38b2` Update checkpoints. (presstab)
-- #331 `b1fb710` [Consensus] Bump protocol. Activate via Spork 15. (rejectedpromise)
+### Backports:
+- [`068b20bc7`](https://github.com/cryptodexpay/cryptodex/commit/068b20bc7) Merge #8256: BUG: bitcoin-qt crash
+- [`f71ab1daf`](https://github.com/cryptodexpay/cryptodex/commit/f71ab1daf) Merge #11847: Fixes compatibility with boost 1.66 (#1836)
 
-### Wallet
-- #308 `bd8a982` [Minting] Clear mempool after invalid block from miner (presstab)
-- #316 `ed192cf` [Minting] Better filtering of zPhr serials in miner. (presstab)
+### PrivateSend:
+- [`fa5fc418a`](https://github.com/cryptodexpay/cryptodex/commit/fa5fc418a) Fix -liquidityprovider option (#1829)
+- [`d261575b4`](https://github.com/cryptodexpay/cryptodex/commit/d261575b4) Skip existing masternode conections on mixing (#1833)
+- [`21a10057d`](https://github.com/cryptodexpay/cryptodex/commit/21a10057d) Protect CKeyHolderStorage via mutex (#1834)
+- [`476888683`](https://github.com/cryptodexpay/cryptodex/commit/476888683) Avoid reference leakage in CKeyHolderStorage::AddKey (#1840)
 
-### GUI
-- #309 `f560ffc` [UI] Better error message when too much inputs are used for spending zCXD (Mrs-X)
-- #317 `b27cb72` [UI] Wallet repair option to resync from scratch (Mrs-X)
-- #323 `2b648be` [UI] Balance fix + bubble-help + usability improvements (Mrs-X)
-- #324 `8cdbb5d` disable negative confirmation numbers. (Mrs-X)
+### InstantSend:
+- [`d6e2aa843`](https://github.com/cryptodexpay/cryptodex/commit/d6e2aa843) Swap iterations and fUseInstantSend parameters in ApproximateBestSubset (#1819)
+- [`c9bafe154`](https://github.com/cryptodexpay/cryptodex/commit/c9bafe154) Vote on IS only if it was accepted to mempool (#1826)
 
-### Build System
-- #322 `a91feb3` [Build] Add compile/link summary to configure (Fuzzbawls)
-
-### Miscellaneous
-- #298 `3580394` Reorg help to stop travis errors (Jon Spock)
-- #302 `efb648b` [Cleanup] Remove unused variables (rejectedpromise)
-- #307 `dbd801d` Remove hard-coded GIT_ARCHIVE define (Jon Spock)
-- #314 `f1c830a` Fix issue causing crash when cryptodexd --help was invoked (Jon Spock)
-- #326 `8b6a13e` Combine 2 LogPrintf statement to reduce debug.log clutter (Jon Spock)
-- #328 `a6c18c8` [Main] CryptoDEX not responding on user quitting app (Aaron Langford)
-
+### Other:
+- [`ada41c3af`](https://github.com/cryptodexpay/cryptodex/commit/ada41c3af) Fix crash on exit when -createwalletbackups=0 (#1810)
+- [`63e0e30e3`](https://github.com/cryptodexpay/cryptodex/commit/63e0e30e3) bump version to 0.12.2.3 (#1827)
 
 Credits
 =======
 
 Thanks to everyone who directly contributed to this release:
-- Fuzzbawls
-- Jon Spock
-- Mrs-X
-- furszy
-- presstab
-- rejectedpromise
-- aaronlangford31
 
-As well as everyone that helped translating on [Transifex](https://www.transifex.com/projects/p/cryptodex-project-translations/).
+- Alexander Block
+- lodgepole
+- UdjinM6
+
+As well as Bitcoin Core Developers and everyone that submitted issues,
+reviewed pull requests or helped translating on
+[Transifex](https://www.transifex.com/projects/p/cryptodex/).
+
+
+Older releases
+==============
+
+CryptoDex was previously known as Darkcoin.
+
+Darkcoin tree 0.8.x was a fork of Litecoin tree 0.8, original name was XCoin
+which was first released on Jan/18/2014.
+
+Darkcoin tree 0.9.x was the open source implementation of masternodes based on
+the 0.8.x tree and was first released on Mar/13/2014.
+
+Darkcoin tree 0.10.x used to be the closed source implementation of Darksend
+which was released open source on Sep/25/2014.
+
+CryptoDex Core tree 0.11.x was a fork of Bitcoin Core tree 0.9,
+Darkcoin was rebranded to CryptoDex.
+
+CryptoDex Core tree 0.12.0.x was a fork of Bitcoin Core tree 0.10.
+
+CryptoDex Core tree 0.12.1.x was a fork of Bitcoin Core tree 0.12.
+
+These release are considered obsolete. Old release notes can be found here:
+
+- [v0.12.2.2](release-notes/cryptodex/release-notes-0.12.2.2.md) released Dec/17/2017
+- [v0.12.2](release-notes/cryptodex/release-notes-0.12.2.md) released Nov/08/2017
+- [v0.12.1](release-notes/cryptodex/release-notes-0.12.1.md) released Feb/06/2017
+- [v0.12.0](release-notes/cryptodex/release-notes-0.12.0.md) released Jun/15/2015
+- [v0.11.2](release-notes/cryptodex/release-notes-0.11.2.md) released Mar/04/2015
+- [v0.11.1](release-notes/cryptodex/release-notes-0.11.1.md) released Feb/10/2015
+- [v0.11.0](release-notes/cryptodex/release-notes-0.11.0.md) released Jan/15/2015
+- [v0.10.x](release-notes/cryptodex/release-notes-0.10.0.md) released Sep/25/2014
+- [v0.9.x](release-notes/cryptodex/release-notes-0.9.0.md) released Mar/13/2014
+

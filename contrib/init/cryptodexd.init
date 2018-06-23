@@ -1,6 +1,6 @@
 #!/bin/bash
 #
-#  cryptodexd The CryptoDEX core server.
+#  cryptodexd The CryptoDex Core server.
 #
 #
 # chkconfig: 345 80 20
@@ -23,14 +23,14 @@ prog=cryptodexd
 lockfile=${BITCOIND_LOCKFILE-/var/lock/subsys/cryptodexd}
 
 # cryptodexd defaults to /usr/bin/cryptodexd, override with BITCOIND_BIN
-bitcoind=${BITCOIND_BIN-/usr/bin/cryptodexd}
+cryptodexd=${BITCOIND_BIN-/usr/bin/cryptodexd}
 
 # cryptodexd opts default to -disablewallet, override with BITCOIND_OPTS
-bitcoind_opts=${BITCOIND_OPTS}
+cryptodexd_opts=${BITCOIND_OPTS--disablewallet}
 
 start() {
     echo -n $"Starting $prog: "
-    daemon $DAEMONOPTS $bitcoind $bitcoind_opts
+    daemon $DAEMONOPTS $cryptodexd $cryptodexd_opts
     RETVAL=$?
     echo
     [ $RETVAL -eq 0 ] && touch $lockfile

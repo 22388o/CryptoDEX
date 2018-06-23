@@ -1,13 +1,13 @@
 #!/usr/bin/env python
 #
-# Use the raw transactions API to spend CXDs received on particular addresses,
+# Use the raw transactions API to spend cryptodexs received on particular addresses,
 # and send any change back to that same address.
 #
 # Example usage:
 #  spendfrom.py  # Lists available funds
 #  spendfrom.py --from=ADDRESS --to=ADDRESS --amount=11.00
 #
-# Assumes it will talk to a cryptodexd or cryptodex-Qt running
+# Assumes it will talk to a cryptodexd or CryptoDex-Qt running
 # on localhost.
 #
 # Depends on jsonrpc
@@ -33,12 +33,12 @@ def check_json_precision():
         raise RuntimeError("JSON encode/decode loses precision")
 
 def determine_db_dir():
-    """Return the default location of the cryptodex data directory"""
+    """Return the default location of the CryptoDex Core data directory"""
     if platform.system() == "Darwin":
-        return os.path.expanduser("~/Library/Application Support/CryptoDEX/")
+        return os.path.expanduser("~/Library/Application Support/CryptoDexCore/")
     elif platform.system() == "Windows":
-        return os.path.join(os.environ['APPDATA'], "CryptoDEX")
-    return os.path.expanduser("~/.cryptodex")
+        return os.path.join(os.environ['APPDATA'], "CryptoDexCore")
+    return os.path.expanduser("~/.cryptodexcore")
 
 def read_bitcoin_config(dbdir):
     """Read the cryptodex.conf file from dbdir, returns dictionary of settings"""
@@ -63,11 +63,11 @@ def read_bitcoin_config(dbdir):
     return dict(config_parser.items("all"))
 
 def connect_JSON(config):
-    """Connect to a cryptodex JSON-RPC server"""
+    """Connect to a CryptoDex Core JSON-RPC server"""
     testnet = config.get('testnet', '0')
     testnet = (int(testnet) > 0)  # 0/1 in config file, convert to True/False
     if not 'rpcport' in config:
-        config['rpcport'] = 11774 if testnet else 6424
+        config['rpcport'] = 19998 if testnet else 9998
     connect = "http://%s:%s@127.0.0.1:%s"%(config['rpcuser'], config['rpcpassword'], config['rpcport'])
     try:
         result = ServiceProxy(connect)
@@ -221,9 +221,9 @@ def main():
 
     parser = optparse.OptionParser(usage="%prog [options]")
     parser.add_option("--from", dest="fromaddresses", default=None,
-                      help="addresses to get CXDs from")
+                      help="addresses to get cryptodexs from")
     parser.add_option("--to", dest="to", default=None,
-                      help="address to get send CXDs to")
+                      help="address to get send cryptodexs to")
     parser.add_option("--amount", dest="amount", default=None,
                       help="amount to send")
     parser.add_option("--fee", dest="fee", default="0.0",

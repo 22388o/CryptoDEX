@@ -1,6 +1,6 @@
 usr/local/bin/cryptodex-qt usr/bin
-share/pixmaps/bitcoin32.xpm usr/share/pixmaps
-share/pixmaps/bitcoin16.xpm usr/share/pixmaps
-share/pixmaps/bitcoin128.png usr/share/pixmaps
+share/pixmaps/cryptodex32.xpm usr/share/pixmaps
+share/pixmaps/cryptodex16.xpm usr/share/pixmaps
+share/pixmaps/cryptodex128.png usr/share/pixmaps
 debian/cryptodex-qt.desktop usr/share/applications
 debian/cryptodex-qt.protocol usr/share/kde4/services/

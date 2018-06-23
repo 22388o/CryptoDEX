@@ -1,5 +1,4 @@
 IDI_ICON1 ICON DISCARDABLE "icons/bitcoin.ico"
-IDI_ICON2 ICON DISCARDABLE "icons/bitcoin_testnet.ico"
 
 #include <windows.h>             // needed for VERSIONINFO
 #include "../../clientversion.h" // holds the needed client version information
@@ -19,14 +18,14 @@ BEGIN
     BEGIN
         BLOCK "040904E4" // U.S. English - multilingual (hex)
         BEGIN
-            VALUE "CompanyName",        "CryptoDEX"
-            VALUE "FileDescription",    "CryptoDEX Core (OSS GUI client for CryptoDEX)"
+            VALUE "CompanyName",        "CryptoDex"
+            VALUE "FileDescription",    "CryptoDex Core (GUI node for CryptoDex)"
             VALUE "FileVersion",        VER_FILEVERSION_STR
             VALUE "InternalName",       "cryptodex-qt"
             VALUE "LegalCopyright",     COPYRIGHT_STR
-            VALUE "LegalTrademarks1",   "Distributed under the MIT/X11 software license, see the accompanying file COPYING or http://www.opensource.org/licenses/mit-license.php."
+            VALUE "LegalTrademarks1",   "Distributed under the MIT software license, see the accompanying file COPYING or http://www.opensource.org/licenses/mit-license.php."
             VALUE "OriginalFilename",   "cryptodex-qt.exe"
-            VALUE "ProductName",        "CryptoDEX Core"
+            VALUE "ProductName",        "CryptoDex Core"
             VALUE "ProductVersion",     VER_PRODUCTVERSION_STR
         END
     END

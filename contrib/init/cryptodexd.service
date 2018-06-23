@@ -1,19 +1,15 @@
 [Unit]
-Description=CryptoDEX's distributed currency daemon
+Description=CryptoDex's distributed currency daemon
 After=network.target
 
 [Service]
-User=cryptodex
-Group=cryptodex
+User=cryptodexcore
+Group=cryptodexcore
 
 Type=forking
 PIDFile=/var/lib/cryptodexd/cryptodexd.pid
-
 ExecStart=/usr/bin/cryptodexd -daemon -pid=/var/lib/cryptodexd/cryptodexd.pid \
-          -conf=/etc/cryptodex/cryptodex.conf -datadir=/var/lib/cryptodexd
-
-ExecStop=-/usr/bin/cryptodex-cli -conf=/etc/cryptodex/cryptodex.conf \
-         -datadir=/var/lib/cryptodexd stop
+-conf=/etc/cryptodexcore/cryptodex.conf -datadir=/var/lib/cryptodexd -disablewallet
 
 Restart=always
 PrivateTmp=true

@@ -1,15 +1,13 @@
 // Copyright (c) 2009-2010 Satoshi Nakamoto
-// Copyright (c) 2009-2015 The Bitcoin developers
-// Copyright (c) 2009-2015 The Dash developers
-// Copyright (c) 2015-2017 The PIVX developers
-// Copyright (c) 2017 The CryptoDEX developers
-// Distributed under the MIT/X11 software license, see the accompanying
+// Copyright (c) 2009-2015 The Bitcoin Core developers
+// Copyright (c) 2014-2017 The CryptoDex Core developers
+// Distributed under the MIT software license, see the accompanying
 // file COPYING or http://www.opensource.org/licenses/mit-license.php.
 
 #include "chainparamsbase.h"
 #include "clientversion.h"
-#include "rpcclient.h"
-#include "rpcprotocol.h"
+#include "rpc/client.h"
+#include "rpc/protocol.h"
 #include "util.h"
 #include "utilstrencodings.h"
 
@@ -23,24 +21,22 @@
 
 #include <univalue.h>
 
-#define _(x) std::string(x) /* Keep the _() around in case gettext or such will be used later to translate non-UI */
-
 using namespace std;
 
+static const char DEFAULT_RPCCONNECT[] = "127.0.0.1";
 static const int DEFAULT_HTTP_CLIENT_TIMEOUT=900;
+static const int CONTINUE_EXECUTION=-1;
 
 std::string HelpMessageCli()
 {
     string strUsage;
     strUsage += HelpMessageGroup(_("Options:"));
     strUsage += HelpMessageOpt("-?", _("This help message"));
-    strUsage += HelpMessageOpt("-conf=<file>", strprintf(_("Specify configuration file (default: %s)"), "cryptodex.conf"));
+    strUsage += HelpMessageOpt("-conf=<file>", strprintf(_("Specify configuration file (default: %s)"), BITCOIN_CONF_FILENAME));
     strUsage += HelpMessageOpt("-datadir=<dir>", _("Specify data directory"));
-    strUsage += HelpMessageOpt("-testnet", _("Use the test network"));
-    strUsage += HelpMessageOpt("-regtest", _("Enter regression test mode, which uses a special chain in which blocks can be "
-                                             "solved instantly. This is intended for regression testing tools and app development."));
-    strUsage += HelpMessageOpt("-rpcconnect=<ip>", strprintf(_("Send commands to node running on <ip> (default: %s)"), "127.0.0.1"));
-    strUsage += HelpMessageOpt("-rpcport=<port>", strprintf(_("Connect to JSON-RPC on <port> (default: %u or testnet: %u)"), 6424, 11774));
+    AppendParamsHelpMessages(strUsage);
+    strUsage += HelpMessageOpt("-rpcconnect=<ip>", strprintf(_("Send commands to node running on <ip> (default: %s)"), DEFAULT_RPCCONNECT));
+    strUsage += HelpMessageOpt("-rpcport=<port>", strprintf(_("Connect to JSON-RPC on <port> (default: %u or testnet: %u)"), BaseParams(CBaseChainParams::MAIN).RPCPort(), BaseParams(CBaseChainParams::TESTNET).RPCPort()));
     strUsage += HelpMessageOpt("-rpcwait", _("Wait for RPC server to start"));
     strUsage += HelpMessageOpt("-rpcuser=<user>", _("Username for JSON-RPC connections"));
     strUsage += HelpMessageOpt("-rpcpassword=<pw>", _("Password for JSON-RPC connections"));
@@ -61,52 +57,69 @@ std::string HelpMessageCli()
 class CConnectionFailed : public std::runtime_error
 {
 public:
-    explicit inline CConnectionFailed(const std::string& msg) : std::runtime_error(msg)
-    {
-    }
+
+    explicit inline CConnectionFailed(const std::string& msg) :
+        std::runtime_error(msg)
+    {}
+
 };
 
-static bool AppInitRPC(int argc, char* argv[])
+//
+// This function returns either one of EXIT_ codes when it's expected to stop the process or
+// CONTINUE_EXECUTION when it's expected to continue further.
+//
+static int AppInitRPC(int argc, char* argv[])
 {
     //
     // Parameters
     //
     ParseParameters(argc, argv);
-    if (argc < 2 || mapArgs.count("-?") || mapArgs.count("-help") || mapArgs.count("-version")) {
-        std::string strUsage = _("CryptoDEX Core RPC client version") + " " + FormatFullVersion() + "\n";
+    if (argc<2 || mapArgs.count("-?") || mapArgs.count("-h") || mapArgs.count("-help") || mapArgs.count("-version")) {
+        std::string strUsage = _("CryptoDex Core RPC client version") + " " + FormatFullVersion() + "\n";
         if (!mapArgs.count("-version")) {
             strUsage += "\n" + _("Usage:") + "\n" +
-                        "  cryptodex-cli [options] <command> [params]  " + _("Send command to CryptoDEX Core") + "\n" +
-                        "  cryptodex-cli [options] help                " + _("List commands") + "\n" +
-                        "  cryptodex-cli [options] help <command>      " + _("Get help for a command") + "\n";
+                  "  cryptodex-cli [options] <command> [params]  " + _("Send command to CryptoDex Core") + "\n" +
+                  "  cryptodex-cli [options] help                " + _("List commands") + "\n" +
+                  "  cryptodex-cli [options] help <command>      " + _("Get help for a command") + "\n";
 
             strUsage += "\n" + HelpMessageCli();
         }
 
         fprintf(stdout, "%s", strUsage.c_str());
-        return false;
+        if (argc < 2) {
+            fprintf(stderr, "Error: too few parameters\n");
+            return EXIT_FAILURE;
+        }
+        return EXIT_SUCCESS;
     }
-    if (!boost::filesystem::is_directory(GetDataDir(false))) {
+    bool datadirFromCmdLine = mapArgs.count("-datadir") != 0;
+    if (datadirFromCmdLine && !boost::filesystem::is_directory(GetDataDir(false))) {
         fprintf(stderr, "Error: Specified data directory \"%s\" does not exist.\n", mapArgs["-datadir"].c_str());
-        return false;
+        return EXIT_FAILURE;
     }
     try {
         ReadConfigFile(mapArgs, mapMultiArgs);
-    } catch (std::exception& e) {
-        fprintf(stderr, "Error reading configuration file: %s\n", e.what());
-        return false;
+    } catch (const std::exception& e) {
+        fprintf(stderr,"Error reading configuration file: %s\n", e.what());
+        return EXIT_FAILURE;
+    }
+    if (!datadirFromCmdLine && !boost::filesystem::is_directory(GetDataDir(false))) {
+        fprintf(stderr, "Error: Specified data directory \"%s\" from config file does not exist.\n", mapArgs["-datadir"].c_str());
+        return EXIT_FAILURE;
     }
     // Check for -testnet or -regtest parameter (BaseParams() calls are only valid after this clause)
-    if (!SelectBaseParamsFromCommandLine()) {
-        fprintf(stderr, "Error: Invalid combination of -regtest and -testnet.\n");
-        return false;
+    try {
+        SelectBaseParams(ChainNameFromCommandLine());
+    } catch (const std::exception& e) {
+        fprintf(stderr, "Error: %s\n", e.what());
+        return EXIT_FAILURE;
     }
     if (GetBoolArg("-rpcssl", false))
     {
         fprintf(stderr, "Error: SSL mode for RPC (-rpcssl) is no longer supported.\n");
-        return false;
+        return EXIT_FAILURE;
     }
-    return true;
+    return CONTINUE_EXECUTION;
 }
 
 
@@ -144,7 +157,7 @@ static void http_request_done(struct evhttp_request *req, void *ctx)
 
 UniValue CallRPC(const string& strMethod, const UniValue& params)
 {
-    std::string host = GetArg("-rpcconnect", "127.0.0.1");
+    std::string host = GetArg("-rpcconnect", DEFAULT_RPCCONNECT);
     int port = GetArg("-rpcport", BaseParams().RPCPort());
 
     // Create event base
@@ -169,7 +182,7 @@ UniValue CallRPC(const string& strMethod, const UniValue& params)
         // Try fall back to cookie-based authentication if no password is provided
         if (!GetAuthCookie(&strRPCUserColonPass)) {
             throw runtime_error(strprintf(
-                 _("Could not locate RPC credentials. No authentication cookie could be found, and no rpcpassword is set in the configuration file (%s)"),
+                _("Could not locate RPC credentials. No authentication cookie could be found, and no rpcpassword is set in the configuration file (%s)"),
                     GetConfigFile().string().c_str()));
 
         }
@@ -220,7 +233,7 @@ UniValue CallRPC(const string& strMethod, const UniValue& params)
     return reply;
 }
 
-int CommandLineRPC(int argc, char* argv[])
+int CommandLineRPC(int argc, char *argv[])
 {
     string strPrint;
     int nRet = 0;
@@ -248,7 +261,7 @@ int CommandLineRPC(int argc, char* argv[])
 
                 // Parse reply
                 const UniValue& result = find_value(reply, "result");
-                const UniValue& error = find_value(reply, "error");
+                const UniValue& error  = find_value(reply, "error");
 
                 if (!error.isNull()) {
                     // Error
@@ -257,6 +270,15 @@ int CommandLineRPC(int argc, char* argv[])
                         throw CConnectionFailed("server in warmup");
                     strPrint = "error: " + error.write();
                     nRet = abs(code);
+                    if (error.isObject())
+                    {
+                        UniValue errCode = find_value(error, "code");
+                        UniValue errMsg  = find_value(error, "message");
+                        strPrint = errCode.isNull() ? "" : "error code: "+errCode.getValStr()+"\n";
+
+                        if (errMsg.isStr())
+                            strPrint += "error message:\n"+errMsg.get_str();
+                    }
                 } else {
                     // Result
                     if (result.isNull())
@@ -268,19 +290,23 @@ int CommandLineRPC(int argc, char* argv[])
                 }
                 // Connection succeeded, no need to retry.
                 break;
-            } catch (const CConnectionFailed& e) {
+            }
+            catch (const CConnectionFailed&) {
                 if (fWait)
                     MilliSleep(1000);
                 else
                     throw;
             }
         } while (fWait);
-    } catch (boost::thread_interrupted) {
+    }
+    catch (const boost::thread_interrupted&) {
         throw;
-    } catch (std::exception& e) {
+    }
+    catch (const std::exception& e) {
         strPrint = string("error: ") + e.what();
         nRet = EXIT_FAILURE;
-    } catch (...) {
+    }
+    catch (...) {
         PrintExceptionContinue(NULL, "CommandLineRPC()");
         throw;
     }
@@ -296,13 +322,15 @@ int main(int argc, char* argv[])
     SetupEnvironment();
     if (!SetupNetworking()) {
         fprintf(stderr, "Error: Initializing networking failed\n");
-        exit(1);
+        exit(EXIT_FAILURE);
     }
 
     try {
-        if (!AppInitRPC(argc, argv))
-            return EXIT_FAILURE;
-    } catch (std::exception& e) {
+        int ret = AppInitRPC(argc, argv);
+        if (ret != CONTINUE_EXECUTION)
+            return ret;
+    }
+    catch (const std::exception& e) {
         PrintExceptionContinue(&e, "AppInitRPC()");
         return EXIT_FAILURE;
     } catch (...) {
@@ -313,7 +341,8 @@ int main(int argc, char* argv[])
     int ret = EXIT_FAILURE;
     try {
         ret = CommandLineRPC(argc, argv);
-    } catch (std::exception& e) {
+    }
+    catch (const std::exception& e) {
         PrintExceptionContinue(&e, "CommandLineRPC()");
     } catch (...) {
         PrintExceptionContinue(NULL, "CommandLineRPC()");

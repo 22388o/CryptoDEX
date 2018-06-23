@@ -1,14 +1,15 @@
 // Copyright (c) 2009-2010 Satoshi Nakamoto
-// Copyright (c) 2009-2014 The Bitcoin Core developers
+// Copyright (c) 2009-2015 The Bitcoin Core developers
 // Distributed under the MIT software license, see the accompanying
 // file COPYING or http://www.opensource.org/licenses/mit-license.php.
 
 #include "chain.h"
+#include "chainparams.h"
 #include "primitives/block.h"
 #include "primitives/transaction.h"
-#include "main.h"
+#include "validation.h"
 #include "httpserver.h"
-#include "rpcserver.h"
+#include "rpc/server.h"
 #include "streams.h"
 #include "sync.h"
 #include "txmempool.h"
@@ -42,16 +43,19 @@ static const struct {
 };
 
 struct CCoin {
-    uint32_t nTxVer; // Don't call this nVersion, that name has a special meaning inside IMPLEMENT_SERIALIZE
     uint32_t nHeight;
     CTxOut out;
 
     ADD_SERIALIZE_METHODS;
 
+    CCoin() : nHeight(0) {}
+    CCoin(Coin&& in) : nHeight(in.nHeight), out(std::move(in.out)) {}
+
     template <typename Stream, typename Operation>
     inline void SerializationOp(Stream& s, Operation ser_action, int nType, int nVersion)
     {
-        READWRITE(nTxVer);
+        uint32_t nTxVerDummy = 0;
+        READWRITE(nTxVerDummy);
         READWRITE(nHeight);
         READWRITE(out);
     }
@@ -71,15 +75,24 @@ static bool RESTERR(HTTPRequest* req, enum HTTPStatusCode status, string message
     return false;
 }
 
-static enum RetFormat ParseDataFormat(vector<string>& params, const string& strReq)
+static enum RetFormat ParseDataFormat(std::string& param, const std::string& strReq)
 {
-    boost::split(params, strReq, boost::is_any_of("."));
-    if (params.size() > 1) {
-        for (unsigned int i = 0; i < ARRAYLEN(rf_names); i++)
-            if (params[1] == rf_names[i].name)
-                return rf_names[i].rf;
+    const std::string::size_type pos = strReq.rfind('.');
+    if (pos == std::string::npos)
+    {
+        param = strReq;
+        return rf_names[0].rf;
     }
 
+    param = strReq.substr(0, pos);
+    const std::string suff(strReq, pos + 1);
+
+    for (unsigned int i = 0; i < ARRAYLEN(rf_names); i++)
+        if (suff == rf_names[i].name)
+            return rf_names[i].rf;
+
+    /* If no suffix is found, return original string.  */
+    param = strReq;
     return rf_names[0].rf;
 }
 
@@ -121,10 +134,10 @@ static bool rest_headers(HTTPRequest* req,
 {
     if (!CheckWarmup(req))
         return false;
-    vector<string> params;
-    const RetFormat rf = ParseDataFormat(params, strURIPart);
+    std::string param;
+    const RetFormat rf = ParseDataFormat(param, strURIPart);
     vector<string> path;
-    boost::split(path, params[0], boost::is_any_of("/"));
+    boost::split(path, param, boost::is_any_of("/"));
 
     if (path.size() != 2)
         return RESTERR(req, HTTP_BAD_REQUEST, "No header count specified. Use /rest/headers/<count>/<hash>.<ext>.");
@@ -196,10 +209,9 @@ static bool rest_block(HTTPRequest* req,
 {
     if (!CheckWarmup(req))
         return false;
-    vector<string> params;
-    const RetFormat rf = ParseDataFormat(params, strURIPart);
+    std::string hashStr;
+    const RetFormat rf = ParseDataFormat(hashStr, strURIPart);
 
-    string hashStr = params[0];
     uint256 hash;
     if (!ParseHashStr(hashStr, hash))
         return RESTERR(req, HTTP_BAD_REQUEST, "Invalid hash: " + hashStr);
@@ -212,10 +224,10 @@ static bool rest_block(HTTPRequest* req,
             return RESTERR(req, HTTP_NOT_FOUND, hashStr + " not found");
 
         pblockindex = mapBlockIndex[hash];
-        if (!(pblockindex->nStatus & BLOCK_HAVE_DATA) && pblockindex->nTx > 0)
+        if (fHavePruned && !(pblockindex->nStatus & BLOCK_HAVE_DATA) && pblockindex->nTx > 0)
             return RESTERR(req, HTTP_NOT_FOUND, hashStr + " not available (pruned data)");
 
-        if (!ReadBlockFromDisk(block, pblockindex))
+        if (!ReadBlockFromDisk(block, pblockindex, Params().GetConsensus()))
             return RESTERR(req, HTTP_NOT_FOUND, hashStr + " not found");
     }
 
@@ -268,8 +280,8 @@ static bool rest_chaininfo(HTTPRequest* req, const std::string& strURIPart)
 {
     if (!CheckWarmup(req))
         return false;
-    vector<string> params;
-    const RetFormat rf = ParseDataFormat(params, strURIPart);
+    std::string param;
+    const RetFormat rf = ParseDataFormat(param, strURIPart);
 
     switch (rf) {
     case RF_JSON: {
@@ -293,8 +305,8 @@ static bool rest_mempool_info(HTTPRequest* req, const std::string& strURIPart)
 {
     if (!CheckWarmup(req))
         return false;
-    vector<string> params;
-    const RetFormat rf = ParseDataFormat(params, strURIPart);
+    std::string param;
+    const RetFormat rf = ParseDataFormat(param, strURIPart);
 
     switch (rf) {
     case RF_JSON: {
@@ -318,8 +330,8 @@ static bool rest_mempool_contents(HTTPRequest* req, const std::string& strURIPar
 {
     if (!CheckWarmup(req))
         return false;
-    vector<string> params;
-    const RetFormat rf = ParseDataFormat(params, strURIPart);
+    std::string param;
+    const RetFormat rf = ParseDataFormat(param, strURIPart);
 
     switch (rf) {
     case RF_JSON: {
@@ -343,17 +355,16 @@ static bool rest_tx(HTTPRequest* req, const std::string& strURIPart)
 {
     if (!CheckWarmup(req))
         return false;
-    vector<string> params;
-    const RetFormat rf = ParseDataFormat(params, strURIPart);
+    std::string hashStr;
+    const RetFormat rf = ParseDataFormat(hashStr, strURIPart);
 
-    string hashStr = params[0];
     uint256 hash;
     if (!ParseHashStr(hashStr, hash))
         return RESTERR(req, HTTP_BAD_REQUEST, "Invalid hash: " + hashStr);
 
     CTransaction tx;
     uint256 hashBlock = uint256();
-    if (!GetTransaction(hash, tx, hashBlock, true))
+    if (!GetTransaction(hash, tx, Params().GetConsensus(), hashBlock, true))
         return RESTERR(req, HTTP_NOT_FOUND, hashStr + " not found");
 
     CDataStream ssTx(SER_NETWORK, PROTOCOL_VERSION);
@@ -396,13 +407,13 @@ static bool rest_getutxos(HTTPRequest* req, const std::string& strURIPart)
 {
     if (!CheckWarmup(req))
         return false;
-    vector<string> params;
-    enum RetFormat rf = ParseDataFormat(params, strURIPart);
+    std::string param;
+    const RetFormat rf = ParseDataFormat(param, strURIPart);
 
     vector<string> uriParts;
-    if (params.size() > 0 && params[0].length() > 1)
+    if (param.length() > 1)
     {
-        std::string strUriParams = params[0].substr(1);
+        std::string strUriParams = param.substr(1);
         boost::split(uriParts, strUriParams, boost::is_any_of("/"));
     }
 
@@ -486,7 +497,7 @@ static bool rest_getutxos(HTTPRequest* req, const std::string& strURIPart)
     if (vOutPoints.size() > MAX_GETUTXOS_OUTPOINTS)
         return RESTERR(req, HTTP_INTERNAL_SERVER_ERROR, strprintf("Error: max outpoints exceeded (max: %d, tried: %d)", MAX_GETUTXOS_OUTPOINTS, vOutPoints.size()));
 
-    // check spentness and form a bitmap (as well as a JSON capable human-readble string representation)
+    // check spentness and form a bitmap (as well as a JSON capable human-readable string representation)
     vector<unsigned char> bitmap;
     vector<CCoin> outs;
     std::string bitmapStringRepresentation;
@@ -504,21 +515,10 @@ static bool rest_getutxos(HTTPRequest* req, const std::string& strURIPart)
             view.SetBackend(viewMempool); // switch cache backend to db+mempool in case user likes to query mempool
 
         for (size_t i = 0; i < vOutPoints.size(); i++) {
-            CCoins coins;
-            uint256 hash = vOutPoints[i].hash;
-            if (view.GetCoins(hash, coins)) {
-                mempool.pruneSpent(hash, coins);
-                if (coins.IsAvailable(vOutPoints[i].n)) {
-                    hits[i] = true;
-                    // Safe to index into vout here because IsAvailable checked if it's off the end of the array, or if
-                    // n is valid but points to an already spent output (IsNull).
-                    CCoin coin;
-                    coin.nTxVer = coins.nVersion;
-                    coin.nHeight = coins.nHeight;
-                    coin.out = coins.vout.at(vOutPoints[i].n);
-                    assert(!coin.out.IsNull());
-                    outs.push_back(coin);
-                }
+            Coin coin;
+            if (view.GetCoin(vOutPoints[i], coin) && !mempool.isSpent(vOutPoints[i])) {
+                hits[i] = true;
+                outs.emplace_back(std::move(coin));
             }
 
             bitmapStringRepresentation.append(hits[i] ? "1" : "0"); // form a binary string representation (human-readable for json output)
@@ -561,7 +561,6 @@ static bool rest_getutxos(HTTPRequest* req, const std::string& strURIPart)
         UniValue utxos(UniValue::VARR);
         BOOST_FOREACH (const CCoin& coin, outs) {
             UniValue utxo(UniValue::VOBJ);
-            utxo.push_back(Pair("txvers", (int32_t)coin.nTxVer));
             utxo.push_back(Pair("height", (int32_t)coin.nHeight));
             utxo.push_back(Pair("value", ValueFromAmount(coin.out.nValue)));
 

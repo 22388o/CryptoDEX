@@ -1,7 +1,6 @@
 // Copyright (c) 2009-2010 Satoshi Nakamoto
-// Copyright (c) 2009-2014 The Bitcoin developers
-// Copyright (c) 2014-2015 The Dash developers
-// Copyright (c) 2015-2017 The PIVX developers
+// Copyright (c) 2009-2015 The Bitcoin Core developers
+// Copyright (c) 2014-2017 The CryptoDex Core developers
 // Distributed under the MIT software license, see the accompanying
 // file COPYING or http://www.opensource.org/licenses/mit-license.php.
 
@@ -19,6 +18,7 @@
 #include "compat.h"
 #include "tinyformat.h"
 #include "utiltime.h"
+#include "amount.h"
 
 #include <exception>
 #include <map>
@@ -27,26 +27,38 @@
 #include <vector>
 
 #include <boost/filesystem/path.hpp>
+#include <boost/signals2/signal.hpp>
 #include <boost/thread/exceptions.hpp>
 
-//CryptoDEX only features
+// Debugging macros
+
+// Uncomment the following line to enable debugging messages
+// or enable on a per file basis prior to inclusion of util.h
+//#define ENABLE_CXD_DEBUG
+#ifdef ENABLE_CXD_DEBUG
+#define DBG( x ) x
+#else
+#define DBG( x ) 
+#endif
+
+//CryptoDex only features
 
 extern bool fMasterNode;
 extern bool fLiteMode;
-extern bool fEnableSwiftTX;
-extern int nSwiftTXDepth;
-extern int nZeromintPercentage;
-extern const int64_t AUTOMINT_DELAY;
-extern int nPreferredDenom;
-extern int nAnonymizeCryptoDEXAmount;
-extern int nLiquidityProvider;
-extern bool fEnableZeromint;
-extern int64_t enforceMasternodePaymentsTime;
-extern std::string strMasterNodeAddr;
-extern int keysLoaded;
-extern bool fSucessfullyLoaded;
-extern std::vector<int64_t> obfuScationDenominations;
-extern std::string strBudgetMode;
+extern int nWalletBackups;
+
+static const bool DEFAULT_LOGTIMEMICROS  = false;
+static const bool DEFAULT_LOGIPS         = false;
+static const bool DEFAULT_LOGTIMESTAMPS  = true;
+static const bool DEFAULT_LOGTHREADNAMES = false;
+
+/** Signals for translation. */
+class CTranslationInterface
+{
+public:
+    /** Translate a message to the native language of the user. */
+    boost::signals2::signal<std::string (const char* psz)> Translate;
+};
 
 extern std::map<std::string, std::string> mapArgs;
 extern std::map<std::string, std::vector<std::string> > mapMultiArgs;
@@ -56,8 +68,24 @@ extern bool fPrintToDebugLog;
 extern bool fServer;
 extern std::string strMiscWarning;
 extern bool fLogTimestamps;
+extern bool fLogTimeMicros;
+extern bool fLogThreadNames;
 extern bool fLogIPs;
 extern volatile bool fReopenDebugLog;
+extern CTranslationInterface translationInterface;
+
+extern const char * const BITCOIN_CONF_FILENAME;
+extern const char * const BITCOIN_PID_FILENAME;
+
+/**
+ * Translation function: Call Translate signal on UI interface, which returns a boost::optional result.
+ * If no translation slot is registered, nothing is returned, and simply return the input.
+ */
+inline std::string _(const char* psz)
+{
+    boost::optional<std::string> rv = translationInterface.Translate(psz);
+    return rv ? (*rv) : psz;
+}
 
 void SetupEnvironment();
 bool SetupNetworking();
@@ -65,7 +93,7 @@ bool SetupNetworking();
 /** Return true if log accepts specified category */
 bool LogAcceptCategory(const char* category);
 /** Send a string to the log output */
-int LogPrintStr(const std::string& str);
+int LogPrintStr(const std::string &str);
 
 #define LogPrintf(...) LogPrint(NULL, __VA_ARGS__)
 
@@ -73,20 +101,20 @@ int LogPrintStr(const std::string& str);
  * When we switch to C++11, this can be switched to variadic templates instead
  * of this macro-based construction (see tinyformat.h).
  */
-#define MAKE_ERROR_AND_LOG_FUNC(n)                                                              \
-    /**   Print to debug.log if -debug=category switch is given OR category is NULL. */         \
-    template <TINYFORMAT_ARGTYPES(n)>                                                           \
-    static inline int LogPrint(const char* category, const char* format, TINYFORMAT_VARARGS(n)) \
-    {                                                                                           \
-        if (!LogAcceptCategory(category)) return 0;                                             \
-        return LogPrintStr(tfm::format(format, TINYFORMAT_PASSARGS(n)));                        \
-    }                                                                                           \
-    /**   Log error and return false */                                                         \
-    template <TINYFORMAT_ARGTYPES(n)>                                                           \
-    static inline bool error(const char* format, TINYFORMAT_VARARGS(n))                         \
-    {                                                                                           \
-        LogPrintStr(std::string("ERROR: ") + tfm::format(format, TINYFORMAT_PASSARGS(n)) + "\n");            \
-        return false;                                                                           \
+#define MAKE_ERROR_AND_LOG_FUNC(n)                                        \
+    /**   Print to debug.log if -debug=category switch is given OR category is NULL. */ \
+    template<TINYFORMAT_ARGTYPES(n)>                                          \
+    static inline int LogPrint(const char* category, const char* format, TINYFORMAT_VARARGS(n))  \
+    {                                                                         \
+        if(!LogAcceptCategory(category)) return 0;                            \
+        return LogPrintStr(tfm::format(format, TINYFORMAT_PASSARGS(n))); \
+    }                                                                         \
+    /**   Log error and return false */                                        \
+    template<TINYFORMAT_ARGTYPES(n)>                                          \
+    static inline bool error(const char* format, TINYFORMAT_VARARGS(n))                     \
+    {                                                                         \
+        LogPrintStr("ERROR: " + tfm::format(format, TINYFORMAT_PASSARGS(n)) + "\n"); \
+        return false;                                                         \
     }
 
 TINYFORMAT_FOREACH_ARGNUM(MAKE_ERROR_AND_LOG_FUNC)
@@ -97,7 +125,7 @@ TINYFORMAT_FOREACH_ARGNUM(MAKE_ERROR_AND_LOG_FUNC)
  */
 static inline int LogPrint(const char* category, const char* format)
 {
-    if (!LogAcceptCategory(category)) return 0;
+    if(!LogAcceptCategory(category)) return 0;
     return LogPrintStr(format);
 }
 static inline bool error(const char* format)
@@ -106,31 +134,32 @@ static inline bool error(const char* format)
     return false;
 }
 
-double double_safe_addition(double fValue, double fIncrement);
-double double_safe_multiplication(double fValue, double fmultiplicator);
-void PrintExceptionContinue(std::exception* pex, const char* pszThread);
-void ParseParameters(int argc, const char* const argv[]);
-void FileCommit(FILE* fileout);
-bool TruncateFile(FILE* file, unsigned int length);
+void PrintExceptionContinue(const std::exception *pex, const char* pszThread);
+void ParseParameters(int argc, const char*const argv[]);
+void FileCommit(FILE *fileout);
+bool TruncateFile(FILE *file, unsigned int length);
 int RaiseFileDescriptorLimit(int nMinFD);
-void AllocateFileRange(FILE* file, unsigned int offset, unsigned int length);
+void AllocateFileRange(FILE *file, unsigned int offset, unsigned int length);
 bool RenameOver(boost::filesystem::path src, boost::filesystem::path dest);
 bool TryCreateDirectory(const boost::filesystem::path& p);
 boost::filesystem::path GetDefaultDataDir();
-const boost::filesystem::path& GetDataDir(bool fNetSpecific = true);
+const boost::filesystem::path &GetDataDir(bool fNetSpecific = true);
+const boost::filesystem::path &GetBackupsDir();
+void ClearDatadirCache();
 boost::filesystem::path GetConfigFile();
 boost::filesystem::path GetMasternodeConfigFile();
 #ifndef WIN32
 boost::filesystem::path GetPidFile();
-void CreatePidFile(const boost::filesystem::path& path, pid_t pid);
+void CreatePidFile(const boost::filesystem::path &path, pid_t pid);
 #endif
 void ReadConfigFile(std::map<std::string, std::string>& mapSettingsRet, std::map<std::string, std::vector<std::string> >& mapMultiSettingsRet);
 #ifdef WIN32
 boost::filesystem::path GetSpecialFolderPath(int nFolder, bool fCreate = true);
 #endif
 boost::filesystem::path GetTempPath();
+void OpenDebugLog();
 void ShrinkDebugFile();
-void runCommand(std::string strCommand);
+void runCommand(const std::string& strCommand);
 
 inline bool IsSwitchChar(char c)
 {
@@ -203,31 +232,72 @@ std::string HelpMessageGroup(const std::string& message);
  */
 std::string HelpMessageOpt(const std::string& option, const std::string& message);
 
+/**
+ * Return the number of physical cores available on the current system.
+ * @note This does not count virtual cores, such as those provided by HyperThreading
+ * when boost is newer than 1.56.
+ */
+int GetNumCores();
+
 void SetThreadPriority(int nPriority);
 void RenameThread(const char* name);
+std::string GetThreadName();
 
 /**
  * .. and a wrapper that just calls func once
  */
-template <typename Callable>
-void TraceThread(const char* name, Callable func)
+template <typename Callable> void TraceThread(const char* name,  Callable func)
 {
     std::string s = strprintf("cryptodex-%s", name);
     RenameThread(s.c_str());
-    try {
+    try
+    {
         LogPrintf("%s thread start\n", name);
         func();
         LogPrintf("%s thread exit\n", name);
-    } catch (boost::thread_interrupted) {
+    }
+    catch (const boost::thread_interrupted&)
+    {
         LogPrintf("%s thread interrupt\n", name);
         throw;
-    } catch (std::exception& e) {
+    }
+    catch (const std::exception& e) {
         PrintExceptionContinue(&e, name);
         throw;
-    } catch (...) {
+    }
+    catch (...) {
         PrintExceptionContinue(NULL, name);
         throw;
     }
 }
+
+
+/**
+ * @brief Converts version strings to 4-byte unsigned integer
+ * @param strVersion version in "x.x.x" format (decimal digits only)
+ * @return 4-byte unsigned integer, most significant byte is always 0
+ * Throws std::bad_cast if format doesn\t match.
+ */
+uint32_t StringVersionToInt(const std::string& strVersion);
+
+
+/**
+ * @brief Converts version as 4-byte unsigned integer to string
+ * @param nVersion 4-byte unsigned integer, most significant byte is always 0
+ * @return version string in "x.x.x" format (last 3 bytes as version parts)
+ * Throws std::bad_cast if format doesn\t match.
+ */
+std::string IntVersionToString(uint32_t nVersion);
+
+
+/**
+ * @brief Copy of the IntVersionToString, that returns "Invalid version" string
+ * instead of throwing std::bad_cast
+ * @param nVersion 4-byte unsigned integer, most significant byte is always 0
+ * @return version string in "x.x.x" format (last 3 bytes as version parts)
+ * or "Invalid version" if can't cast the given value
+ */
+std::string SafeIntVersionToString(uint32_t nVersion);
+
 
 #endif // BITCOIN_UTIL_H

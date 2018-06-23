@@ -1,14 +1,14 @@
 Translations
 ============
 
-The CryptoDEX Core project has been designed to support multiple localisations. This makes adding new phrases, and completely new languages easily achievable. For managing all application translations, CryptoDEX Core makes use of the Transifex online translation management tool.
+The CryptoDex Core project has been designed to support multiple localisations. This makes adding new phrases, and completely new languages easily achievable. For managing all application translations, CryptoDex Core makes use of the Transifex online translation management tool.
 
 ### Helping to translate (using Transifex)
-Transifex is setup to monitor the GitHub repo for updates, and when code containing new translations is found, Transifex will process any changes. It may take several hours after a pull-request has been merged, to appear in the Transifex web interface.
+Transifex is setup to monitor the Github repo for updates, and when code containing new translations is found, Transifex will process any changes. It may take several hours after a pull-request has been merged, to appear in the Transifex web interface.
 
-Multiple language support is critical in assisting CryptoDEX's global adoption, and growth. One of CryptoDEX's greatest strengths is cross-border money transfers, any help making that easier is greatly appreciated.
+Multiple language support is critical in assisting CryptoDex’s global adoption, and growth. One of CryptoDex’s greatest strengths is cross-boarder money transfers, any help making that easier is greatly appreciated.
 
-See the [Transifex CryptoDEX project](https://www.transifex.com/cryptodex-project/cryptodex-project-translations/) to assist in translations.
+See the [Transifex CryptoDex project](https://www.transifex.com/projects/p/cryptodex/) to assist in translations. You should also join the translation mailing list for announcements - see details below.
 
 ### Writing code with translations
 We use automated scripts to help extract translations in both Qt, and non-Qt source files. It is rarely necessary to manually edit the files in `src/qt/locale/`. The translation source files must adhere to the following format:
@@ -32,7 +32,7 @@ QToolBar *toolbar = addToolBar(tr("Tabs toolbar"));
 ### Creating a pull-request
 For general PRs, you shouldn’t include any updates to the translation source files. They will be updated periodically, primarily around pre-releases, allowing time for any new phrases to be translated before public releases. This is also important in avoiding translation related merge conflicts.
 
-When an updated source file is merged into the GitHub repo, Transifex will automatically detect it (although it can take several hours). Once processed, the new strings will show up as "Remaining" in the Transifex web interface and are ready for translators.
+When an updated source file is merged into the Github repo, Transifex will automatically detect it (although it can take several hours). Once processed, the new strings will show up as "Remaining" in the Transifex web interface and are ready for translators.
 
 To create the pull-request, use the following commands:
 ```
@@ -40,10 +40,11 @@ git add src/qt/cryptodexstrings.cpp src/qt/locale/cryptodex_en.ts
 git commit
 ```
 
+
 ### Creating a Transifex account
 Visit the [Transifex Signup](https://www.transifex.com/signup/) page to create an account. Take note of your username and password, as they will be required to configure the command-line tool.
 
-You can find the CryptoDEX translation project at [https://www.transifex.com/cryptodex-project/cryptodex-project-translations/](https://www.transifex.com/cryptodex-project/cryptodex-project-translations/).
+You can find the CryptoDex translation project at [https://www.transifex.com/projects/p/cryptodex/](https://www.transifex.com/projects/p/cryptodex/).
 
 ### Installing the Transifex client command-line tool
 The client it used to fetch updated translations. If you are having problems, or need more details, see [http://docs.transifex.com/developer/client/setup](http://docs.transifex.com/developer/client/setup)
@@ -68,7 +69,7 @@ username = USERNAME
 
 Please see [http://docs.transifex.com/developer/client/setup#windows](http://docs.transifex.com/developer/client/setup#windows) for details on installation.
 
-The Transifex CryptoDEX project config file is included as part of the repo. It can be found at `.tx/config`, however you shouldn’t need change anything.
+The Transifex CryptoDex project config file is included as part of the repo. It can be found at `.tx/config`, however you shouldn’t need change anything.
 
 ### Synchronising translations
 To assist in updating translations, we have created a script to help.
@@ -94,7 +95,7 @@ When new plurals are added to the source file, it's important to do the followin
 7. Save the source file
 
 ### Translating a new language
-To create a new language template, you will need to edit the languages manifest file `src/qt/cryptodex_locale.qrc` and add a new entry. Below is an example of the English language entry.
+To create a new language template, you will need to edit the languages manifest file `src/qt/bitcoin.qrc` and add a new entry. Below is an example of the english language entry.
 
 ```xml
 <qresource prefix="/translations">
@@ -106,6 +107,4 @@ To create a new language template, you will need to edit the languages manifest 
 **Note:** that the language translation file **must end in `.qm`** (the compiled extension), and not `.ts`.
 
 ### Questions and general assistance
-The CryptoDEX Core translation maintainers include *Fuzzbawls and s3v3nh4cks*. You can find them, and others, in the [CryptoDEX Slack](https://cryptodex.slack.com).
-
-Announcements will be posted during application pre-releases to notify translators to check for updates.
+Check official forum at [https://cryptodextalk.org/forums/cryptodex-worldwide-collaboration.88/](https://cryptodextalk.org/forums/cryptodex-worldwide-collaboration.88/).

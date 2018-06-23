@@ -1,8 +1,9 @@
-// Copyright (c) 2012-2013 The Bitcoin Core developers
-// Distributed under the MIT/X11 software license, see the accompanying
+// Copyright (c) 2012-2015 The Bitcoin Core developers
+// Distributed under the MIT software license, see the accompanying
 // file COPYING or http://www.opensource.org/licenses/mit-license.php.
 
 #include "util.h"
+#include "test/test_cryptodex.h"
 
 #include <string>
 #include <vector>
@@ -11,7 +12,7 @@
 #include <boost/foreach.hpp>
 #include <boost/test/unit_test.hpp>
 
-BOOST_AUTO_TEST_SUITE(getarg_tests)
+BOOST_FIXTURE_TEST_SUITE(getarg_tests, BasicTestingSetup)
 
 static void ResetArgs(const std::string& strArg)
 {
@@ -20,7 +21,7 @@ static void ResetArgs(const std::string& strArg)
       boost::split(vecArg, strArg, boost::is_space(), boost::token_compress_on);
 
     // Insert dummy executable name:
-    vecArg.insert(vecArg.begin(), "testbitcoin");
+    vecArg.insert(vecArg.begin(), "testcryptodex");
 
     // Convert to char*:
     std::vector<const char*> vecChar;
@@ -125,7 +126,7 @@ BOOST_AUTO_TEST_CASE(intarg)
     BOOST_CHECK_EQUAL(GetArg("-bar", 11), 0);
 }
 
-BOOST_AUTO_TEST_CASE(doubledash)
+BOOST_AUTO_TEST_CASE(doublecryptodex)
 {
     ResetArgs("--foo");
     BOOST_CHECK_EQUAL(GetBoolArg("-foo", false), true);

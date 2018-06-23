@@ -13,8 +13,9 @@ can be found in the contrib/init folder.
 1. Service User
 ---------------------------------
 
-All three startup configurations assume the existence of a "cryptodex" user
+All three Linux startup configurations assume the existence of a "cryptodexcore" user
 and group.  They must be created before attempting to use these scripts.
+The OS X configuration assumes cryptodexd will be set up for the current user.
 
 2. Configuration
 ---------------------------------
@@ -29,68 +30,93 @@ file, however it is recommended that a strong and secure password be used
 as this password is security critical to securing the wallet should the
 wallet be enabled.
 
-If cryptodexd is run with "-daemon" flag, and no rpcpassword is set, it will
-print a randomly generated suitable password to stderr.  You can also
-generate one from the shell yourself like this:
+If cryptodexd is run with the "-server" flag (set by default), and no rpcpassword is set,
+it will use a special cookie file for authentication. The cookie is generated with random
+content when the daemon starts, and deleted when it exits. Read access to this file
+controls who can access it through RPC.
 
-bash -c 'tr -dc a-zA-Z0-9 < /dev/urandom | head -c32 && echo'
+By default the cookie is stored in the data directory, but it's location can be overridden
+with the option '-rpccookiefile'.
 
-Once you have a password in hand, set rpcpassword= in /etc/cryptodex/cryptodex.conf
+This allows for running cryptodexd without having to do any manual configuration.
+
+`conf`, `pid`, and `wallet` accept relative paths which are interpreted as
+relative to the data directory. `wallet` *only* supports relative paths.
 
 For an example configuration file that describes the configuration settings,
-see contrib/debian/examples/cryptodex.conf.
+see `contrib/debian/examples/cryptodex.conf`.
 
 3. Paths
 ---------------------------------
 
+3a) Linux
+
 All three configurations assume several paths that might need to be adjusted.
 
-Binary:              /usr/bin/cryptodexd
-Configuration file:  /etc/cryptodex/cryptodex.conf
-Data directory:      /var/lib/cryptodexd
-PID file:            /var/run/cryptodexd/cryptodexd.pid (OpenRC and Upstart)
-                     /var/lib/cryptodexd/cryptodexd.pid (systemd)
+Binary:              `/usr/bin/cryptodexd`
+Configuration file:  `/etc/cryptodexcore/cryptodex.conf`
+Data directory:      `/var/lib/cryptodexd`
+PID file:            `/var/run/cryptodexd/cryptodexd.pid` (OpenRC and Upstart) or `/var/lib/cryptodexd/cryptodexd.pid` (systemd)
+Lock file:           `/var/lock/subsys/cryptodexd` (CentOS)
 
 The configuration file, PID directory (if applicable) and data directory
-should all be owned by the cryptodex user and group.  It is advised for security
+should all be owned by the cryptodexcore user and group.  It is advised for security
 reasons to make the configuration file and data directory only readable by the
-cryptodex user and group.  Access to cryptodex-cli and other cryptodexd rpc clients
+cryptodexcore user and group.  Access to cryptodex-cli and other cryptodexd rpc clients
 can then be controlled by group membership.
+
+3b) Mac OS X
+
+Binary:              `/usr/local/bin/cryptodexd`
+Configuration file:  `~/Library/Application Support/CryptoDexCore/cryptodex.conf`
+Data directory:      `~/Library/Application Support/CryptoDexCore`
+Lock file:           `~/Library/Application Support/CryptoDexCore/.lock`
 
 4. Installing Service Configuration
 -----------------------------------
 
 4a) systemd
 
-Installing this .service file consists on just copying it to
+Installing this .service file consists of just copying it to
 /usr/lib/systemd/system directory, followed by the command
-"systemctl daemon-reload" in order to update running systemd configuration.
+`systemctl daemon-reload` in order to update running systemd configuration.
 
-To test, run "systemctl start cryptodexd" and to enable for system startup run
-"systemctl enable cryptodexd"
+To test, run `systemctl start cryptodexd` and to enable for system startup run
+`systemctl enable cryptodexd`
 
 4b) OpenRC
 
 Rename cryptodexd.openrc to cryptodexd and drop it in /etc/init.d.  Double
 check ownership and permissions and make it executable.  Test it with
-"/etc/init.d/cryptodexd start" and configure it to run on startup with
-"rc-update add cryptodexd"
+`/etc/init.d/cryptodexd start` and configure it to run on startup with
+`rc-update add cryptodexd`
 
 4c) Upstart (for Debian/Ubuntu based distributions)
 
-Drop cryptodexd.conf in /etc/init.  Test by running "service cryptodexd start"
+Drop cryptodexd.conf in /etc/init.  Test by running `service cryptodexd start`
 it will automatically start on reboot.
 
 NOTE: This script is incompatible with CentOS 5 and Amazon Linux 2014 as they
-use old versions of Upstart and do not supply the start-stop-daemon uitility.
+use old versions of Upstart and do not supply the start-stop-daemon utility.
 
 4d) CentOS
 
-Copy cryptodexd.init to /etc/init.d/cryptodexd. Test by running "service cryptodexd start".
+Copy cryptodexd.init to /etc/init.d/cryptodexd. Test by running `service cryptodexd start`.
 
 Using this script, you can adjust the path and flags to the cryptodexd program by
-setting the CryptoDEXD and FLAGS environment variables in the file
+setting the CXDD and FLAGS environment variables in the file
 /etc/sysconfig/cryptodexd. You can also use the DAEMONOPTS environment variable here.
+
+4e) Mac OS X
+
+Copy org.cryptodex.cryptodexd.plist into ~/Library/LaunchAgents. Load the launch agent by
+running `launchctl load ~/Library/LaunchAgents/org.cryptodex.cryptodexd.plist`.
+
+This Launch Agent will cause cryptodexd to start whenever the user logs in.
+
+NOTE: This approach is intended for those wanting to run cryptodexd as the current user.
+You will need to modify org.cryptodex.cryptodexd.plist if you intend to use it as a
+Launch Daemon with a dedicated cryptodexcore user.
 
 5. Auto-respawn
 -----------------------------------
