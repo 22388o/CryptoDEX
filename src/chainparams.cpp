@@ -140,7 +140,7 @@ public:
         assert(genesis.hashMerkleRoot == uint256S("0x75a67463b386bb01fdea1160f4fad1c8cabd6cd86cdd76cd3a4c23af8cf71103"));
 
 
-       vSeeds.push_back(CDNSSeedData("seednode",  "45.63.89.104"));
+       vSeeds.push_back(CDNSSeedData("seednode",  "45.32.42.75"));
 
         // CryptoDex addresses start with 'C'
         base58Prefixes[PUBKEY_ADDRESS] = std::vector<unsigned char>(1,28);
