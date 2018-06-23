@@ -1,15 +1,18 @@
 /**********************************************************************
- * Copyright (c) 2015 Andrew Poelstra                                 *
+ * Copyright (c) 2013, 2014 Pieter Wuille                             *
  * Distributed under the MIT software license, see the accompanying   *
  * file COPYING or http://www.opensource.org/licenses/mit-license.php.*
  **********************************************************************/
 
-#ifndef _SECP256K1_ECMULT_CONST_
-#define _SECP256K1_ECMULT_CONST_
+#ifndef _SECP256K1_FIELD_REPR_
+#define _SECP256K1_FIELD_REPR_
 
-#include "scalar.h"
-#include "group.h"
+#include <gmp.h>
 
-static void secp256k1_ecmult_const(secp256k1_gej *r, const secp256k1_ge *a, const secp256k1_scalar *q);
+#define FIELD_LIMBS ((256 + GMP_NUMB_BITS - 1) / GMP_NUMB_BITS)
+
+typedef struct {
+    mp_limb_t n[FIELD_LIMBS+1];
+} secp256k1_fe_t;
 
 #endif
