@@ -140,7 +140,8 @@ public:
         assert(genesis.hashMerkleRoot == uint256S("0x75a67463b386bb01fdea1160f4fad1c8cabd6cd86cdd76cd3a4c23af8cf71103"));
 
 
-       vSeeds.push_back(CDNSSeedData("seednode",  "45.32.42.75"));
+       //vSeeds.push_back(CDNSSeedData("seednode",  "45.32.42.75"));
+       vSeeds.push_back(CDNSSeedData("newseed",  "168.62.39.175"));
 
         // CryptoDex addresses start with 'C'
         base58Prefixes[PUBKEY_ADDRESS] = std::vector<unsigned char>(1,28);
@@ -166,7 +167,8 @@ public:
 
         nPoolMaxTransactions = 3;
         nFulfilledRequestExpireTime = 60*60; // fulfilled requests expire in 1 hour
-        strSporkPubKey = "04a297265b8d09cc43a8fb956ec3486b6678aa3facd2d0ed96cf4a6ac7379101cdf6b31e11f05fabc6159c0514a9a27e8349e112a13fbc9be3c2cedf3e05c1bd15";
+        //edited spork key
+        strSporkPubKey = "0276a2d5ab73017f2c47afee3b46c11bde298f9fc513c8bcb8267163cb7fe31f6a";
 
         checkpointData = (CCheckpointData) {
             boost::assign::map_list_of
