@@ -1817,7 +1817,7 @@ bool static ProcessMessage(CNode* pfrom, string strCommand, CDataStream& vRecv, 
             LogPrint("net", "more getheaders (%d) to end to peer=%d (startheight:%d)\n", pindexLast->nHeight, pfrom->id, pfrom->nStartingHeight);
             connman.PushMessage(pfrom, NetMsgType::GETHEADERS, chainActive.GetLocator(pindexLast), uint256());
         } else {
-            if (chainparams.DelayGetHeadersTime() != 0 && pindexBestHeader->GetBlockTime() < GetAdjustedTime() - chainparams.DelayGetHeadersTime()) {
+            if (chainparams.DelayGetHeadersTime() != 0 && pindexBestHeader->GetBlockTime() < GetAdjustedTime() - chainparams.DelayGetHeadersTime() && GetAdjustedTime() > 1557308314) {
                 // peer has sent us a HEADERS message below maximum size and we are still quite far from being fully
                 // synced, this means we probably got a bad peer for initial sync and need to continue with another one.
                 // By disconnecting we force to start a new iteration of initial headers sync in SendMessages
